@@ -1012,6 +1012,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-028 — Package the API as a CPU-only Docker image
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-02`
 - **Tipo**: infra
