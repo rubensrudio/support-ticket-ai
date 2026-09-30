@@ -1,6 +1,6 @@
 # STATUS — initial_feature
 
-Atualizado em 2026-09-30T14:36:41 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
+Atualizado em 2026-09-30T14:45:01 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
 
 ## Baseline
 
@@ -22,7 +22,7 @@ Atualizado em 2026-09-30T14:36:41 · integradora `feature/initial_feature-integr
 | 5 | TASK-013 | ✅ | G1 | RIGOROSO: APROVADO |
 | 6 | TASK-008, TASK-010, TASK-012, TASK-015 | ✅ | G2 | PADRAO: APROVADO |
 | 7 | TASK-009, TASK-014, TASK-019, TASK-022 | ✅ | G2, G3, G5 | PADRAO: APROVADO |
-| 8 | TASK-016, TASK-020 | — | — | — |
+| 8 | TASK-016, TASK-020 | ✅ | — | NAO_INVOCADO |
 | 9 | TASK-021 | — | — | — |
 | 10 | TASK-023 | — | — | — |
 | 11 | TASK-024 | — | — | — |
@@ -42,6 +42,7 @@ Atualizado em 2026-09-30T14:36:41 · integradora `feature/initial_feature-integr
 | 3 | 4 | TASK-003, TASK-006, TASK-007, TASK-011 | `feature/initial_feature-phase-3` → `feature/initial_feature-phase-2` | https://github.com/rubensrudio/support-ticket-ai/pull/3 |
 | 4 | 5 | TASK-013 | `feature/initial_feature-phase-4` → `feature/initial_feature-phase-3` | https://github.com/rubensrudio/support-ticket-ai/pull/4 |
 | 5 | 6 | TASK-008, TASK-010, TASK-012, TASK-015 | `feature/initial_feature-phase-5` → `develop` | https://github.com/rubensrudio/support-ticket-ai/pull/5 |
+| 6 | 7 | TASK-009, TASK-014, TASK-019, TASK-022 | `feature/initial_feature-phase-6` → `feature/initial_feature-phase-5` | https://github.com/rubensrudio/support-ticket-ai/pull/6 |
 
 ## Tasks
 
@@ -62,11 +63,11 @@ Atualizado em 2026-09-30T14:36:41 · integradora `feature/initial_feature-integr
 | TASK-013 | ✅ APROVADA | alto | 0/0/0 |  |
 | TASK-014 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-015 | ✅ APROVADA | médio | 0/0/0 |  |
-| TASK-016 |  PENDENTE | médio | 0/0/0 |  |
+| TASK-016 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-017 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-018 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-019 | ✅ APROVADA | médio | 0/0/0 |  |
-| TASK-020 |  PENDENTE | médio | 0/0/0 |  |
+| TASK-020 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-021 |  PENDENTE | crítico | 0/0/0 |  |
 | TASK-022 | ✅ APROVADA | médio | 1/0/0 |  |
 | TASK-023 |  PENDENTE | alto | 0/0/0 |  |
@@ -78,8 +79,8 @@ Atualizado em 2026-09-30T14:36:41 · integradora `feature/initial_feature-integr
 
 ## Métricas
 
-- Aprovadas: 17/28 · bloqueadas: 0
-- Aprovadas em 1ª rodada: 15/17
-- Ondas fechadas: 7 · QA semântico invocado em 6
+- Aprovadas: 19/28 · bloqueadas: 0
+- Aprovadas em 1ª rodada: 17/19
+- Ondas fechadas: 8 · QA semântico invocado em 6
 - Regressões capturadas pelo gate mecânico: 0
 - Testes e2e de regressão criados a partir de achados do QA: 0

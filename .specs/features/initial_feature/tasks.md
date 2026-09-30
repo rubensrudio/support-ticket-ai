@@ -528,6 +528,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-016 — Orchestrate training, evaluation and registration
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-06`, `MODEL-07`, `MODEL-08`, `MODEL-09`, `MODEL-90`, `OPS-04`
 - **Tipo**: lógica-negócio
@@ -681,6 +682,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-020 — Implement append-only feedback repository
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `FDBK-01`, `FDBK-02`, `FDBK-03`, `FDBK-04`, `FDBK-94`
 - **Tipo**: crud-padrão
