@@ -244,6 +244,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-008 — Store and version dataset splits
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-90`
 - **Tipo**: crud-padrão
@@ -321,6 +322,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-010 — Compute classification metrics
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-03`
 - **Tipo**: lógica-negócio
@@ -389,6 +391,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-012 — Train TF-IDF and Logistic Regression baseline
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-01`, `MODEL-07`
 - **Tipo**: lógica-negócio
@@ -493,6 +496,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-015 — Log training runs to MLflow
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-04`
 - **Tipo**: integração-externa
