@@ -4,6 +4,7 @@ from typing import Any
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from ticket_classifier.api.errors import (
     error_response,
@@ -234,3 +235,36 @@ def test_validation_message_unknown_error_type_is_invalid_body() -> None:
 
 def test_validation_message_empty_errors_is_invalid_body() -> None:
     assert validation_message([]) == INVALID_BODY
+
+
+def _model_validate_json_errors(raw: str) -> list[Any]:
+    with pytest.raises(ValidationError) as exc_info:
+        FeedbackRequest.model_validate_json(raw)
+    return list(exc_info.value.errors())
+
+
+def test_fdbk92_model_validate_json_invalid_category_is_one_of() -> None:
+    errors = _model_validate_json_errors(json.dumps(_valid_feedback(category="hardware")))
+
+    assert validation_message(errors) == CATEGORY_ONE_OF
+
+
+def test_fdbk92_model_validate_json_invalid_priority_is_one_of() -> None:
+    errors = _model_validate_json_errors(json.dumps(_valid_feedback(priority="urgent")))
+
+    assert validation_message(errors) == PRIORITY_ONE_OF
+
+
+def test_fdbk92_model_validate_json_missing_prediction_id_is_required() -> None:
+    payload = _valid_feedback()
+    del payload["prediction_id"]
+    errors = _model_validate_json_errors(json.dumps(payload))
+
+    assert validation_message(errors) == "Field 'prediction_id' is required."
+
+
+@pytest.mark.parametrize("raw", ["not json", "[]"])
+def test_fdbk92_model_validate_json_invalid_body(raw: str) -> None:
+    errors = _model_validate_json_errors(raw)
+
+    assert validation_message(errors) == INVALID_BODY

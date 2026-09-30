@@ -24,10 +24,17 @@ def error_response(status_code: int, code: str, message: str) -> JSONResponse:
 
 
 def _field_name(error: Mapping[str, Any]) -> str | None:
-    """Return the top-level body field an error refers to, or None for body-level errors."""
+    """Return the top-level body field an error refers to, or None for body-level errors.
+
+    Accepts FastAPI locations (``("body", "title")``) and plain pydantic locations
+    from ``model_validate_json`` (``("category",)``). An empty location or one that
+    points at a list index is a body-level error.
+    """
     loc = tuple(error.get("loc", ()))
-    if len(loc) >= 2 and loc[0] == "body" and isinstance(loc[1], str):
-        return loc[1]
+    if loc and loc[0] == "body":
+        loc = loc[1:]
+    if loc and isinstance(loc[0], str):
+        return loc[0]
     return None
 
 
