@@ -575,6 +575,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-017 — Generate baseline versus Transformer comparison report
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-04`, `MODEL-05`
 - **Tipo**: lógica-negócio
