@@ -1,0 +1,16 @@
+# Build context exclusions for docker/Dockerfile (BuildKit per-Dockerfile ignore file).
+.venv
+data
+artifacts
+var
+reports
+mlflow.db
+mlartifacts
+mlruns
+dist
+.git
+.specs
+**/__pycache__
+.mypy_cache
+.ruff_cache
+.pytest_cache
