@@ -10,7 +10,9 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
+from ticket_classifier.data.prepare import prepare_dataset
 from ticket_classifier.errors import PipelineError
+from ticket_classifier.pipeline_config import load_pipeline_config
 from ticket_classifier.registry import ModelRegistry
 
 _PROG = "ticket-classifier"
@@ -28,7 +30,37 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", metavar="<command>")
     _add_list_versions_command(subparsers)
+    _add_prepare_command(subparsers)
     return parser
+
+
+def _add_prepare_command(subparsers: "argparse._SubParsersAction[Any]") -> None:
+    parser = subparsers.add_parser(
+        "prepare", help="Prepare the train/validation/test splits from the source dataset."
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path("configs/pipeline.toml"),
+        help="Pipeline configuration file (default: configs/pipeline.toml).",
+    )
+    parser.add_argument(
+        "--mapping",
+        type=Path,
+        default=Path("configs/label_mapping.toml"),
+        help="Label mapping table (default: configs/label_mapping.toml).",
+    )
+    parser.set_defaults(handler=_run_prepare)
+
+
+def _run_prepare(args: argparse.Namespace) -> int:
+    config = load_pipeline_config(args.config)
+    report = prepare_dataset(config, args.mapping)
+    print(
+        f"Prepared splits in {config.data.processed_dir} "
+        f"(splits_version {report['splits_version']})."
+    )
+    return 0
 
 
 _LIST_VERSIONS_HEADER = (
