@@ -24,11 +24,13 @@ _URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
 # group may touch its neighbours without a separator. Two plain digit runs never
 # touch, which keeps matching linear (no catastrophic backtracking). The digit
 # count and the separator/plus requirement are checked in ``_replace_phone``;
-# candidates over 15 digits become ``[NUMBER]``.
+# candidates over 15 digits become ``[NUMBER]``. Only digit boundaries are
+# enforced, so a phone glued to letters or "_" (e.g. "tel555-123-4567") is
+# still masked.
 _DIGIT_GROUP = r"(?:\(\d+\)|\d+)"
 _PHONE_NEXT_GROUP = rf"(?:[ .\-]{{1,3}}{_DIGIT_GROUP}|\(\d+\)|(?<=\))\d+)"
 _PHONE_CANDIDATE_RE = re.compile(
-    rf"(?<![\w+])(?P<plus>\+ ?)?{_DIGIT_GROUP}{_PHONE_NEXT_GROUP}*(?!\w)"
+    rf"(?<![\d+])(?P<plus>\+ ?)?{_DIGIT_GROUP}{_PHONE_NEXT_GROUP}*(?!\d)"
 )
 _PHONE_MIN_DIGITS = 8
 _PHONE_MAX_DIGITS = 15
