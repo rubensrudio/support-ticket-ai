@@ -882,6 +882,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-025 — Implement POST /feedback with API key
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `FDBK-01`, `FDBK-02`, `FDBK-04`, `FDBK-90`, `FDBK-91`, `FDBK-92`, `FDBK-93`, `FDBK-95`
 - **Tipo**: crud-padrão
