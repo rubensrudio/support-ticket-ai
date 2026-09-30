@@ -8,8 +8,11 @@ import argparse
 import sys
 from collections.abc import Callable, Sequence
 
+from ticket_classifier.errors import PipelineError
+
 _PROG = "ticket-classifier"
 _USAGE_ERROR = 2
+_PIPELINE_ERROR = 1
 
 Handler = Callable[[argparse.Namespace], int]
 
@@ -32,4 +35,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if handler is None:
         parser.print_usage(sys.stderr)
         return _USAGE_ERROR
-    return handler(args)
+    try:
+        return handler(args)
+    except PipelineError as exc:
+        print(exc.message, file=sys.stderr)
+        return _PIPELINE_ERROR
