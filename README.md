@@ -102,6 +102,45 @@ Artifacts:
 > Hugging Face Hub on first use. The test suite uses a local tiny model and never
 > downloads anything.
 
+## Retraining
+
+Retraining is manual. It trains a new Transformer version on the original `train` split
+plus the current feedback (the latest feedback of each stored prediction, with its masked
+title and description), selects on the original `validation` split and evaluates on the
+frozen `test` split, which never contains feedback.
+
+Prerequisites:
+
+- a promoted model version (`uv run ticket-classifier train-transformer`);
+- the prepared splits used by the promoted version (same `splits_version`);
+- at least one feedback record in the prediction database (`TICKET_DB_PATH`, default
+  `var/tickets.db`).
+
+```bash
+uv run ticket-classifier retrain
+```
+
+The command accepts `--config` (default `configs/pipeline.toml`), prints the test Macro F1
+of `category` and `priority` for the new and the promoted version, and ends with
+`Retraining finished: <n> feedback records used. Decision: promoted.` or
+`... Decision: not promoted.`
+
+Promotion rule: the new version is promoted only if its test Macro F1 of `category` **and**
+its test Macro F1 of `priority` are both greater than or equal to the promoted version's;
+the previous version becomes `retired`. Otherwise the new version stays `registered` and
+the promoted version is kept.
+
+The command exits with code 1 and registers nothing if:
+
+- another retraining run is in progress (`A retraining run is already in progress.`); runs
+  are serialized with a lock on `artifacts/retrain.lock`;
+- no version is promoted (`No promoted model version. Train a transformer first.`);
+- the splits changed since the promoted version was trained
+  (`Frozen test set changed: ... Retraining aborted.`);
+- there is no feedback (`No feedback records available. Retraining aborted.`).
+
+If training fails, the promoted version is kept and no version is promoted.
+
 ## Results
 
 Compare the most recent Baseline and Transformer versions (or specific ones with
