@@ -929,6 +929,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-026 — Schedule automatic purge in the API lifespan
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-08`
 - **Tipo**: infra
