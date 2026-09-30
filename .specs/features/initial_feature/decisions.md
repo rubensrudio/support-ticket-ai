@@ -215,3 +215,11 @@ Etapa: `/generate-plan`, Passo 3.
 - **Recomendação do hm-qa**: nenhuma (Jev api92_letter=0.51, dúvida); orquestrador recomendou A
 - **Escolha**: A
 - **Observações**: requer atualização de spec/plan (API-92, 8.3).
+
+### LAC-37 — Container serve 503 após promover e reiniciar
+- **Data**: 2026-09-30
+- **Etapa/Task**: QA da onda 17 · TASK-028 (`README.md` "Run with Docker"; causa raiz em `src/ticket_classifier/registry.py` `_write`)
+- **Opções apresentadas**: A) reprovar e documentar no README: repetir `chmod -R a+rX artifacts` após cada train/promote/retrain, antes de reiniciar o container B) aprovar como está, com follow-up no `registry.py`
+- **Recomendação do hm-qa**: nenhuma (Jev api09_violation=0.45, dúvida); orquestrador recomendou A
+- **Escolha**: A
+- **Observações**: follow-up obrigatório fora do escopo: `registry.py` `_write` gravar `registry.json` com 0o644 (hoje mkstemp 0600) e remover o passo manual do README.
