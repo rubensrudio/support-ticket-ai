@@ -181,3 +181,21 @@ Etapa: `/generate-plan`, Passo 3.
 - **Reversibilidade**: alta
 - **Onde impacta**: NFR de desempenho da API `/predict`
 - **Jev**: sem_criterio=0.60 (dúvida); demais <= 0.15
+
+## Decisões do humano — implementação (`/implement`)
+
+### LAC-33 — Telefone seguido de outro grupo de dígitos fica sem máscara
+- **Data**: 2026-09-30
+- **Etapa/Task**: review da onda 3 · TASK-005 (`src/ticket_classifier/preprocessing.py`)
+- **Opções apresentadas**: A) candidato com mais de 15 dígitos mascara o telefone contido nele (ou o candidato inteiro) B) regra literal; vazamento vira risco aceito
+- **Recomendação do hm-reviewer**: A (Jev phone_leak=0.48, dúvida)
+- **Escolha**: A
+- **Observações**: requer atualização de spec/plan (DA-6).
+
+### LAC-34 — Cartão/documento/conta com separadores não é mascarado
+- **Data**: 2026-09-30
+- **Etapa/Task**: review da onda 3 · TASK-005
+- **Opções apresentadas**: A) sequência de grupos de dígitos separados por espaço, "." ou "-" com mais de 15 dígitos no total vira `[NUMBER]` B) DA-6 literal ("dígitos seguidos"); risco aceito
+- **Recomendação do hm-reviewer**: A (Jev card_required=0.56, dúvida)
+- **Escolha**: A
+- **Observações**: requer atualização de spec/plan (DA-6, DATA-07).
