@@ -80,10 +80,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Routers import this module for their dependencies; import them here to
     # avoid a circular import at module load time.
     from ticket_classifier.api.routes_health import router as health_router
+    from ticket_classifier.api.routes_predict import router as predict_router
 
     app = FastAPI(title="ticket-classifier", lifespan=lifespan)
     register_error_handlers(app)
     app.include_router(health_router)
+    app.include_router(predict_router)
     return app
 
 
