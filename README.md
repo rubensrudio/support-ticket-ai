@@ -189,6 +189,86 @@ curl http://127.0.0.1:8000/health
 - `200 {"status": "ok", "model_version": "<version_id>"}` when a model is loaded;
 - `503 {"status": "unavailable", "model_version": null}` otherwise.
 
+## Run with Docker
+
+The image (`docker/Dockerfile`) runs the API on CPU only: `python:3.12-slim`, runtime
+dependencies from `uv.lock` without the `dev` group and without the `train` extra (no
+MLflow), a non-root user, and Hugging Face offline mode (`HF_HUB_OFFLINE=1`,
+`TRANSFORMERS_OFFLINE=1`). Model artifacts are **not** copied into the image: train and
+promote a version first, then mount `artifacts/`.
+
+Build and run from the repository root:
+
+```bash
+docker build -f docker/Dockerfile -t support-ticket-ai . && docker run --rm -p 8000:8000 -v "$(pwd)/artifacts:/app/artifacts:ro" -v "$(pwd)/var:/app/var" -e TICKET_API_KEY support-ticket-ai
+```
+
+- `artifacts/` is mounted read-only at `/app/artifacts` (`TICKET_ARTIFACTS_DIR`).
+- `var/` holds the SQLite database at `/app/var/tickets.db` (`TICKET_DB_PATH`). The
+  container runs as the non-root user with UID `10001`, so the host directory must exist
+  and be writable by that UID before the first run (for example
+  `mkdir -p var && sudo chown 10001:10001 var`).
+- `-e TICKET_API_KEY` passes the key from your shell; without it `/feedback` rejects
+  every request.
+
+Check it with `curl http://localhost:8000/health`. The container smoke test builds the
+image and runs it on port `18080`; it is excluded from the default test run:
+
+```bash
+uv run pytest --junitxml=reports/junit.xml -m container tests/container/test_container_smoke.py
+```
+
+## Architecture
+
+Components (package `ticket_classifier`):
+
+| Component  | Modules                                       | Role |
+|------------|-----------------------------------------------|------|
+| CLI        | `cli.py`                                      | `prepare`, `train-baseline`, `train-transformer`, `list-versions`, `compare`, `analyze-errors`, `retrain`, `purge` |
+| Data       | `data/`, `preprocessing.py`                   | Load the CSV, filter English, mask PII, map labels, dedup, stratified split |
+| Models     | `models/`                                     | Baseline (TF-IDF + logistic regression), Transformer (DistilBERT, two heads), loader |
+| Training   | `training.py`, `retraining.py`, `tracking.py` | Train, evaluate and register versions; MLflow tracking; gated retraining |
+| Evaluation | `evaluation/`                                 | Metrics, comparison report, error analysis |
+| Registry   | `registry.py`                                 | `artifacts/registry.json` with all versions and the single promoted one |
+| API        | `api/`                                        | FastAPI app factory, `/health`, `/predict`, `/feedback`, error handlers, purge loop |
+| Services   | `services/prediction_service.py`              | Prediction use case |
+| Storage    | `storage/`                                    | SQLite schema, predictions, feedback, retention purge |
+
+`POST /predict` flow:
+
+1. At startup the app creates the SQLite schema and loads the promoted version once.
+2. The body (`title`, `description`) is validated by the schema; invalid input returns `422`.
+3. Both fields are normalized and PII-masked with the same routine used in training; a
+   field left empty by this step also returns `422`.
+4. If no model is loaded, the API returns `503 MODEL_UNAVAILABLE`.
+5. The classifier returns category and priority probabilities; `needs_review` is set when
+   a confidence is below `TICKET_REVIEW_THRESHOLD`.
+6. The masked ticket and the prediction are stored under a new `prediction_id`; a storage
+   failure returns `503 STORAGE_UNAVAILABLE`.
+7. The response carries the prediction, the top categories and the `model_version`.
+
+Architectural decisions:
+
+| ID    | Decision |
+|-------|----------|
+| DA-1  | Python 3.12 with `uv` and `uv.lock`, `src/` layout, hatchling build |
+| DA-2  | CPU-only `torch` from the PyTorch CPU index |
+| DA-3  | Pinned public dataset file and revision, downloaded manually (no download code) |
+| DA-4  | Versioned TOML label mapping: priority table, queue defaults, ordered tag rules |
+| DA-5  | Fixed prepare order; all validation happens before anything is written |
+| DA-6  | PII masking order EMAIL, URL, PHONE, NUMBER after Unicode normalization |
+| DA-7  | DistilBERT with a shared encoder and two linear heads, `max_length = 256` |
+| DA-8  | Single seed and fixed thread count for deterministic training |
+| DA-9  | Offline tests with a tiny local model and a synthetic sample dataset |
+| DA-10 | Own model registry in `registry.json`; MLflow is tracking only, the API does not use it |
+| DA-11 | SQLite with WAL, foreign keys, one connection per request, `BEGIN IMMEDIATE` |
+| DA-12 | Synchronous routes; inference serialized by a lock inside the classifier |
+| DA-13 | `/feedback` checks the API key before parsing the JSON body |
+| DA-14 | Retention purge as an `asyncio` task started in the app lifespan |
+| DA-15 | Retraining serialized with an OS file lock on `artifacts/retrain.lock` |
+| DA-16 | Class weighting for imbalance; checkpoint selection by mean validation Macro F1 |
+| DA-17 | `argparse` CLI; domain errors print to stderr and exit with code 1 |
+
 ## Configuration
 
 Runtime settings are read from environment variables:
