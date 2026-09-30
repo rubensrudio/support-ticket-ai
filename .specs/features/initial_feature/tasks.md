@@ -5,6 +5,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 `plan.md` seção 3.
 
 ### TASK-001 — Scaffold Python project with uv and CLI entry point
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-03`
 - **Tipo**: infra
