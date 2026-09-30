@@ -207,3 +207,11 @@ Etapa: `/generate-plan`, Passo 3.
 - **Recomendação do hm-qa**: A (Jev api94_db=0.52, dúvida; reviewer: spec não pede tolerância)
 - **Escolha**: A
 - **Observações**: sem mudança de spec/plan.
+
+### LAC-36 — Campo só com caracteres de controle no `/predict`
+- **Data**: 2026-09-30
+- **Etapa/Task**: QA da onda 11 · TASK-024 (`src/ticket_classifier/services/prediction_service.py`) × TASK-022 (`src/ticket_classifier/api/schemas.py`)
+- **Opções apresentadas**: A) API-92 vale para campo vazio após o pré-processamento DATA-08 → 422 blank, nada gravado B) "vazio" = só após strip; aceitar 200 com título gravado vazio
+- **Recomendação do hm-qa**: nenhuma (Jev api92_letter=0.51, dúvida); orquestrador recomendou A
+- **Escolha**: A
+- **Observações**: requer atualização de spec/plan (API-92, 8.3).
