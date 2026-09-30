@@ -1,10 +1,10 @@
 {
  "versao": 2,
  "feature": "initial_feature",
- "gerado_em": "2026-09-30T12:10:05",
+ "gerado_em": "2026-09-30T12:14:12",
  "hashes": {
   "plan": "b2449f6c04d74168",
-  "tasks": "829436c2c9618ecd"
+  "tasks": "4322ae2f51a20ee4"
  },
  "comandos": [
   {
@@ -124,7 +124,7 @@
    ],
    "wiring": [
     "src/ticket_classifier/__init__.py",
-    "./.gitignore",
+    ".gitignore",
     ".venv/",
     "reports/",
     "dist/",
