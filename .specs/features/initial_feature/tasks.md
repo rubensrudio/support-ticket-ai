@@ -610,6 +610,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-018 — Analyze errors of the promoted model
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-10`, `MODEL-11`
 - **Tipo**: lógica-negócio
