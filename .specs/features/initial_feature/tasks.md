@@ -45,6 +45,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-002 — Define label sets and pipeline error type
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `DATA-02`
 - **Tipo**: lógica-negócio
@@ -141,6 +142,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-005 — Normalize text and mask PII
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `DATA-07`, `DATA-08`
 - **Tipo**: lógica-negócio
