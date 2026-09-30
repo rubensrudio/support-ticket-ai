@@ -53,6 +53,14 @@ def _request(method: str, path: str, body: dict[str, Any] | None = None) -> tupl
         return exc.code, json.loads(exc.read().decode("utf-8") or "null")
 
 
+def _make_world_readable(root: Path) -> None:
+    # The registry is written with owner-only permissions (mkstemp) and the container
+    # runs as UID 10001, so grant read access like the README instructs.
+    for path in [root, *root.rglob("*")]:
+        extra = 0o555 if path.is_dir() else 0o444
+        path.chmod(path.stat().st_mode | extra)
+
+
 def _wait_until_ready(container: str) -> None:
     deadline = time.monotonic() + STARTUP_TIMEOUT_SECONDS
     while time.monotonic() < deadline:
@@ -70,7 +78,12 @@ def _wait_until_ready(container: str) -> None:
 @pytest.fixture(scope="module")
 def image() -> str:
     result = _docker(
-        "build", "-f", "docker/Dockerfile", "-t", IMAGE, str(REPO_ROOT),
+        "build",
+        "-f",
+        "docker/Dockerfile",
+        "-t",
+        IMAGE,
+        str(REPO_ROOT),
         timeout=BUILD_TIMEOUT_SECONDS,
     )
     assert result.returncode == 0, result.stderr[-3000:]
@@ -78,18 +91,23 @@ def image() -> str:
 
 
 @pytest.fixture
-def running_api(
-    image: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> Iterator[str]:
+def running_api(image: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[str]:
     monkeypatch.setenv("MLFLOW_TRACKING_URI", f"sqlite:///{tmp_path}/mlflow.db")
     settings = build_promoted_baseline(tmp_path)
+    _make_world_readable(settings.artifacts_dir)
     container = f"support-ticket-ai-smoke-{uuid.uuid4().hex[:8]}"
     result = _docker(
-        "run", "-d", "--rm",
-        "--name", container,
-        "-p", f"{HOST_PORT}:8000",
-        "-v", f"{settings.artifacts_dir.resolve()}:/app/artifacts:ro",
-        "-e", f"TICKET_API_KEY={TEST_API_KEY}",
+        "run",
+        "-d",
+        "--rm",
+        "--name",
+        container,
+        "-p",
+        f"{HOST_PORT}:8000",
+        "-v",
+        f"{settings.artifacts_dir.resolve()}:/app/artifacts:ro",
+        "-e",
+        f"TICKET_API_KEY={TEST_API_KEY}",
         image,
     )
     assert result.returncode == 0, result.stderr[-2000:]
@@ -102,7 +120,11 @@ def running_api(
 
 def test_image_is_cpu_only_without_mlflow(image: str) -> None:
     result = _docker(
-        "run", "--rm", image, "python", "-c",
+        "run",
+        "--rm",
+        image,
+        "python",
+        "-c",
         "import torch, importlib.util; assert torch.version.cuda is None; "
         "assert importlib.util.find_spec('mlflow') is None",
     )

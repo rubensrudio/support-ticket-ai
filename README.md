@@ -203,7 +203,10 @@ Build and run from the repository root:
 docker build -f docker/Dockerfile -t support-ticket-ai . && docker run --rm -p 8000:8000 -v "$(pwd)/artifacts:/app/artifacts:ro" -v "$(pwd)/var:/app/var" -e TICKET_API_KEY support-ticket-ai
 ```
 
-- `artifacts/` is mounted read-only at `/app/artifacts` (`TICKET_ARTIFACTS_DIR`).
+- `artifacts/` is mounted read-only at `/app/artifacts` (`TICKET_ARTIFACTS_DIR`). The
+  registry file is written with owner-only permissions, so make the tree readable by the
+  container user (UID `10001`) before running: `chmod -R a+rX artifacts`. Otherwise the
+  API starts without a model and `/health` returns `503`.
 - `var/` holds the SQLite database at `/app/var/tickets.db` (`TICKET_DB_PATH`). The
   container runs as the non-root user with UID `10001`, so the host directory must exist
   and be writable by that UID before the first run (for example
