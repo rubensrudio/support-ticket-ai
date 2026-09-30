@@ -1,6 +1,10 @@
 import asyncio
 import logging
+import os
+import socket
 import sqlite3
+import subprocess
+import sys
 import time
 import uuid
 from contextlib import suppress
@@ -214,3 +218,81 @@ def test_ops08_purge_does_not_leak_connection_on_error(
 
     assert asyncio.run(run_purge_once(settings)) == -1
     assert closed == [True]
+
+
+def _free_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return int(sock.getsockname()[1])
+
+
+def test_ops08_purge_line_reaches_process_output_with_default_uvicorn_config(
+    tmp_path: Path,
+) -> None:
+    # Regression (QA OPS-08): started with the documented command and no
+    # --log-config, the purge INFO line must reach the process output.
+    db_path = tmp_path / "tickets.db"
+    _store_prediction(db_path, age_days=120)
+    log_file = tmp_path / "server.log"
+    env = {
+        **os.environ,
+        "TICKET_DB_PATH": str(db_path),
+        "TICKET_ARTIFACTS_DIR": str(tmp_path / "artifacts"),
+        "TICKET_API_KEY": "regression-secret-key",
+    }
+    command = [
+        sys.executable,
+        "-m",
+        "uvicorn",
+        "ticket_classifier.api.app:create_app",
+        "--factory",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(_free_port()),
+    ]
+    with log_file.open("w") as sink:
+        process = subprocess.Popen(command, env=env, stdout=sink, stderr=subprocess.STDOUT)
+        try:
+            deadline = time.monotonic() + 30.0
+            while time.monotonic() < deadline and process.poll() is None:
+                if EXPECTED_LOG in log_file.read_text():
+                    break
+                time.sleep(0.1)
+        finally:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+
+    output = log_file.read_text()
+    assert output.count(EXPECTED_LOG) == 1, output
+    assert "regression-secret-key" not in output
+    assert _prediction_count(db_path) == 0
+
+
+def test_ops08_configure_logging_is_idempotent(monkeypatch: pytest.MonkeyPatch) -> None:
+    package_logger = logging.getLogger("ticket_classifier")
+    monkeypatch.setattr(logging.getLogger(), "handlers", [])
+    monkeypatch.setattr(package_logger, "handlers", [])
+    monkeypatch.setattr(package_logger, "level", logging.NOTSET)
+
+    purge_scheduler.configure_logging()
+    purge_scheduler.configure_logging()
+
+    assert len(package_logger.handlers) == 1
+    assert package_logger.getEffectiveLevel() == logging.INFO
+
+
+def test_ops08_configure_logging_keeps_existing_root_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    package_logger = logging.getLogger("ticket_classifier")
+    monkeypatch.setattr(logging.getLogger(), "handlers", [logging.NullHandler()])
+    monkeypatch.setattr(package_logger, "handlers", [])
+
+    purge_scheduler.configure_logging()
+
+    assert package_logger.handlers == []
