@@ -316,3 +316,55 @@ def test_fdbk01_openapi_describes_feedback_body(client: TestClient) -> None:
     assert set(body_schema["required"]) == {"prediction_id", "category", "priority"}
     assert "201" in operation["responses"]
     assert "401" in operation["responses"]
+
+
+def _break_connect(monkeypatch: pytest.MonkeyPatch) -> None:
+    def failing_connect(*args: object, **kwargs: object) -> sqlite3.Connection:
+        raise sqlite3.OperationalError("unable to open database file")
+
+    monkeypatch.setattr("ticket_classifier.api.app.connect", failing_connect)
+    monkeypatch.setattr(routes_feedback, "connect", failing_connect, raising=False)
+
+
+@pytest.mark.parametrize(
+    ("headers", "kwargs"),
+    [
+        ({}, {"json": {}}),
+        ({"X-API-Key": "wrong"}, {"json": {}}),
+        ({}, {"content": b"not json"}),
+    ],
+    ids=["no-header", "wrong-key", "not-json"],
+)
+def test_fdbk90_unopenable_database_still_returns_401_without_key(
+    client: TestClient,
+    settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
+    headers: dict[str, str],
+    kwargs: dict[str, Any],
+) -> None:
+    _break_connect(monkeypatch)
+
+    response = client.post("/feedback", headers=headers, **kwargs)
+
+    assert response.status_code == 401
+    assert response.json() == UNAUTHORIZED
+    monkeypatch.undo()
+    assert _feedback_rows(settings.db_path) == []
+
+
+def test_fdbk95_unopenable_database_with_valid_key_returns_503(
+    client: TestClient, settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    prediction_id = _predict(client)["prediction_id"]
+    _break_connect(monkeypatch)
+
+    response = client.post(
+        "/feedback",
+        json={"prediction_id": prediction_id, "category": "bug", "priority": "low"},
+        headers=AUTH,
+    )
+
+    assert response.status_code == 503
+    assert response.json() == STORAGE_UNAVAILABLE
+    monkeypatch.undo()
+    assert _feedback_rows(settings.db_path) == []
