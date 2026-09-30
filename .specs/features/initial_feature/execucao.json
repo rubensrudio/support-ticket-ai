@@ -1,0 +1,1386 @@
+{
+ "versao": 2,
+ "feature": "initial_feature",
+ "gerado_em": "2026-09-30T11:34:51",
+ "hashes": {
+  "plan": "4da657696bac149d",
+  "tasks": "3c08a56b7ecacc0e"
+ },
+ "comandos": [
+  {
+   "alvo": "setup",
+   "dir": ".",
+   "cmd": "uv sync --all-extras",
+   "relatorio": null
+  },
+  {
+   "alvo": "lint",
+   "dir": ".",
+   "cmd": "uv run ruff check . --output-format=concise",
+   "relatorio": null
+  },
+  {
+   "alvo": "typecheck",
+   "dir": ".",
+   "cmd": "uv run mypy src",
+   "relatorio": null
+  },
+  {
+   "alvo": "test",
+   "dir": ".",
+   "cmd": "uv run pytest",
+   "relatorio": "reports/junit.xml"
+  },
+  {
+   "alvo": "test_related",
+   "dir": ".",
+   "cmd": "uv run pytest {files}",
+   "relatorio": "reports/junit.xml"
+  },
+  {
+   "alvo": "build",
+   "dir": ".",
+   "cmd": "uv build --wheel --out-dir dist",
+   "relatorio": null
+  }
+ ],
+ "historias_p1": {
+  "P1: Preparar o dataset": [
+   "DATA-01",
+   "DATA-02",
+   "DATA-03",
+   "DATA-04",
+   "DATA-05",
+   "DATA-06",
+   "DATA-07",
+   "DATA-08",
+   "DATA-09",
+   "DATA-10",
+   "DATA-11",
+   "DATA-12",
+   "DATA-90",
+   "DATA-91",
+   "DATA-92"
+  ],
+  "P1: Treinar e comparar modelos": [
+   "MODEL-01",
+   "MODEL-02",
+   "MODEL-03",
+   "MODEL-04",
+   "MODEL-05",
+   "MODEL-06",
+   "MODEL-07",
+   "MODEL-08",
+   "MODEL-09",
+   "MODEL-90"
+  ],
+  "P1: Classificar ticket via POST /predict": [
+   "API-01",
+   "API-02",
+   "API-03",
+   "API-04",
+   "API-05",
+   "API-06",
+   "API-07",
+   "API-08",
+   "API-09",
+   "API-90",
+   "API-91",
+   "API-92",
+   "API-93",
+   "API-94",
+   "API-95",
+   "API-96"
+  ],
+  "P1: Registrar a classificação correta": [
+   "FDBK-01",
+   "FDBK-02",
+   "FDBK-03",
+   "FDBK-04",
+   "FDBK-90",
+   "FDBK-91",
+   "FDBK-92",
+   "FDBK-93",
+   "FDBK-94",
+   "FDBK-95"
+  ]
+ },
+ "tasks": {
+  "TASK-001": {
+   "titulo": "Scaffold Python project with uv and CLI entry point",
+   "tipo": "infra",
+   "risco": "médio",
+   "perfil": "infra",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [],
+   "producao": [
+    "pyproject.toml",
+    "src/ticket_classifier/cli.py"
+   ],
+   "teste": [
+    "tests/conftest.py",
+    "tests/unit/test_cli.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/__init__.py",
+    "./.gitignore",
+    ".venv/",
+    "reports/",
+    "dist/",
+    "data/raw/",
+    "data/processed/",
+    "artifacts/",
+    "var/",
+    "mlflow.db",
+    "mlartifacts/",
+    "mlruns/",
+    "__pycache__/",
+    ".mypy_cache/",
+    ".ruff_cache/",
+    ".pytest_cache/",
+    "uv.lock",
+    "README.md"
+   ],
+   "contratos": [
+    "CT-28"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "OPS-03"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-002": {
+   "titulo": "Define label sets and pipeline error type",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-001"
+   ],
+   "producao": [
+    "src/ticket_classifier/labels.py",
+    "src/ticket_classifier/errors.py"
+   ],
+   "teste": [
+    "tests/unit/test_labels.py",
+    "tests/unit/test_errors.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-2",
+    "CT-28"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "DATA-02"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-003": {
+   "titulo": "Define classifier protocol and probability output",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-002"
+   ],
+   "producao": [
+    "src/ticket_classifier/models/base.py"
+   ],
+   "teste": [
+    "tests/unit/test_models_base.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/models/__init__.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-3"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "API-02"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-004": {
+   "titulo": "Load runtime settings from environment",
+   "tipo": "config",
+   "risco": "crítico",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-001"
+   ],
+   "producao": [
+    "src/ticket_classifier/settings.py"
+   ],
+   "teste": [
+    "tests/unit/test_settings.py"
+   ],
+   "wiring": [],
+   "contratos": [
+    "CT-4"
+   ],
+   "ancora": [
+    "AS-7"
+   ],
+   "requisitos": [
+    "API-04",
+    "FDBK-93"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-005": {
+   "titulo": "Normalize text and mask PII",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-001"
+   ],
+   "producao": [
+    "src/ticket_classifier/preprocessing.py"
+   ],
+   "teste": [
+    "tests/unit/test_preprocessing.py"
+   ],
+   "wiring": [],
+   "contratos": [
+    "CT-5"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "DATA-07",
+    "DATA-08"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-006": {
+   "titulo": "Add pipeline configuration file and loader",
+   "tipo": "config",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-002"
+   ],
+   "producao": [
+    "src/ticket_classifier/pipeline_config.py",
+    "configs/pipeline.toml"
+   ],
+   "teste": [
+    "tests/unit/test_pipeline_config.py"
+   ],
+   "wiring": [],
+   "contratos": [
+    "CT-2",
+    "CT-6"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "DATA-04"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-007": {
+   "titulo": "Implement label mapping table and loader",
+   "tipo": "config",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-002"
+   ],
+   "producao": [
+    "src/ticket_classifier/data/label_mapping.py",
+    "configs/label_mapping.toml"
+   ],
+   "teste": [
+    "tests/unit/test_label_mapping.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/data/__init__.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-2",
+    "CT-7"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "DATA-02",
+    "DATA-91"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-008": {
+   "titulo": "Store and version dataset splits",
+   "tipo": "crud-padrão",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-002"
+   ],
+   "producao": [
+    "src/ticket_classifier/data/splits.py"
+   ],
+   "teste": [
+    "tests/unit/test_splits.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/data/__init__.py"
+   ],
+   "contratos": [
+    "CT-2",
+    "CT-8"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-90"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-009": {
+   "titulo": "Implement dataset preparation command",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "integration",
+   "depende_de": [
+    "TASK-005",
+    "TASK-006",
+    "TASK-007",
+    "TASK-008"
+   ],
+   "producao": [
+    "src/ticket_classifier/data/prepare.py"
+   ],
+   "teste": [
+    "tests/support/__init__.py",
+    "tests/support/sample_data.py",
+    "tests/integration/test_prepare.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py",
+    "README.md",
+    "data/raw/tickets.csv"
+   ],
+   "contratos": [
+    "CT-28",
+    "CT-5",
+    "CT-6",
+    "CT-7",
+    "CT-8",
+    "CT-9"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "DATA-01",
+    "DATA-03",
+    "DATA-04",
+    "DATA-05",
+    "DATA-06",
+    "DATA-09",
+    "DATA-10",
+    "DATA-11",
+    "DATA-12",
+    "DATA-90",
+    "DATA-92"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-010": {
+   "titulo": "Compute classification metrics",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-003"
+   ],
+   "producao": [
+    "src/ticket_classifier/evaluation/metrics.py"
+   ],
+   "teste": [
+    "tests/unit/test_metrics.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/evaluation/__init__.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-10",
+    "CT-3"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-03"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-011": {
+   "titulo": "Implement model version registry",
+   "tipo": "crud-padrão",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-002"
+   ],
+   "producao": [
+    "src/ticket_classifier/registry.py"
+   ],
+   "teste": [
+    "tests/unit/test_registry.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py"
+   ],
+   "contratos": [
+    "CT-11",
+    "CT-2",
+    "CT-28"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-08",
+    "OPS-05",
+    "OPS-06"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-012": {
+   "titulo": "Train TF-IDF and Logistic Regression baseline",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-003",
+    "TASK-006"
+   ],
+   "producao": [
+    "src/ticket_classifier/models/baseline.py"
+   ],
+   "teste": [
+    "tests/unit/test_baseline.py"
+   ],
+   "wiring": [],
+   "contratos": [
+    "CT-1",
+    "CT-12",
+    "CT-3",
+    "CT-6"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-01",
+    "MODEL-07"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-013": {
+   "titulo": "Build multi-head Transformer classifier",
+   "tipo": "lógica-negócio",
+   "risco": "alto",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-003"
+   ],
+   "producao": [
+    "src/ticket_classifier/models/transformer.py"
+   ],
+   "teste": [
+    "tests/support/tiny_model.py",
+    "tests/unit/test_transformer.py"
+   ],
+   "wiring": [
+    "tests/support/__init__.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-13",
+    "CT-3"
+   ],
+   "ancora": [
+    "AS-8"
+   ],
+   "requisitos": [
+    "MODEL-02",
+    "API-06"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-014": {
+   "titulo": "Implement deterministic Transformer fine-tuning loop",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "integration",
+   "depende_de": [
+    "TASK-006",
+    "TASK-010",
+    "TASK-013"
+   ],
+   "producao": [
+    "src/ticket_classifier/models/transformer_training.py"
+   ],
+   "teste": [
+    "tests/integration/test_transformer_training.py"
+   ],
+   "wiring": [],
+   "contratos": [
+    "CT-10",
+    "CT-13",
+    "CT-14",
+    "CT-6"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-02",
+    "MODEL-06",
+    "MODEL-07"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-015": {
+   "titulo": "Log training runs to MLflow",
+   "tipo": "integração-externa",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-011"
+   ],
+   "producao": [
+    "src/ticket_classifier/tracking.py"
+   ],
+   "teste": [
+    "tests/unit/test_tracking.py"
+   ],
+   "wiring": [],
+   "contratos": [
+    "CT-11",
+    "CT-15"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "OPS-04"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-016": {
+   "titulo": "Orchestrate training, evaluation and registration",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "integration",
+   "depende_de": [
+    "TASK-004",
+    "TASK-008",
+    "TASK-009",
+    "TASK-010",
+    "TASK-011",
+    "TASK-012",
+    "TASK-013",
+    "TASK-014",
+    "TASK-015"
+   ],
+   "producao": [
+    "src/ticket_classifier/training.py",
+    "src/ticket_classifier/models/loader.py"
+   ],
+   "teste": [
+    "tests/integration/test_training.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py",
+    "README.md"
+   ],
+   "contratos": [
+    "CT-10",
+    "CT-11",
+    "CT-12",
+    "CT-13",
+    "CT-14",
+    "CT-15",
+    "CT-16",
+    "CT-28",
+    "CT-4",
+    "CT-6",
+    "CT-8",
+    "CT-9"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-06",
+    "MODEL-07",
+    "MODEL-08",
+    "MODEL-09",
+    "MODEL-90",
+    "OPS-04"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-017": {
+   "titulo": "Generate baseline versus Transformer comparison report",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-010",
+    "TASK-011"
+   ],
+   "producao": [
+    "src/ticket_classifier/evaluation/report.py"
+   ],
+   "teste": [
+    "tests/unit/test_report.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py",
+    "README.md",
+    "artifacts/reports/comparison.md"
+   ],
+   "contratos": [
+    "CT-10",
+    "CT-11",
+    "CT-17",
+    "CT-28"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-04",
+    "MODEL-05"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-018": {
+   "titulo": "Analyze errors of the promoted model",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-004",
+    "TASK-016"
+   ],
+   "producao": [
+    "src/ticket_classifier/evaluation/error_analysis.py"
+   ],
+   "teste": [
+    "tests/unit/test_error_analysis.py",
+    "tests/integration/test_error_analysis_cli.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py"
+   ],
+   "contratos": [
+    "CT-10",
+    "CT-11",
+    "CT-16",
+    "CT-18",
+    "CT-28",
+    "CT-3",
+    "CT-4",
+    "CT-8"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "MODEL-10",
+    "MODEL-11"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-019": {
+   "titulo": "Create SQLite schema and prediction repository",
+   "tipo": "crud-padrão",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-002"
+   ],
+   "producao": [
+    "src/ticket_classifier/storage/database.py",
+    "src/ticket_classifier/storage/predictions.py"
+   ],
+   "teste": [
+    "tests/unit/test_storage_predictions.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/storage/__init__.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-19"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "API-07",
+    "API-95"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-020": {
+   "titulo": "Implement append-only feedback repository",
+   "tipo": "crud-padrão",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-019"
+   ],
+   "producao": [
+    "src/ticket_classifier/storage/feedback.py"
+   ],
+   "teste": [
+    "tests/unit/test_storage_feedback.py"
+   ],
+   "wiring": [],
+   "contratos": [
+    "CT-19",
+    "CT-20"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "FDBK-01",
+    "FDBK-02",
+    "FDBK-03",
+    "FDBK-04",
+    "FDBK-94"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-021": {
+   "titulo": "Purge expired predictions without feedback",
+   "tipo": "crud-padrão",
+   "risco": "crítico",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-004",
+    "TASK-020"
+   ],
+   "producao": [
+    "src/ticket_classifier/storage/purge.py"
+   ],
+   "teste": [
+    "tests/unit/test_purge.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py"
+   ],
+   "contratos": [
+    "CT-19",
+    "CT-20",
+    "CT-21",
+    "CT-28",
+    "CT-4"
+   ],
+   "ancora": [
+    "AS-3",
+    "AS-5"
+   ],
+   "requisitos": [
+    "OPS-07",
+    "OPS-90"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-022": {
+   "titulo": "Define API schemas and validation error format",
+   "tipo": "crud-padrão",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-002"
+   ],
+   "producao": [
+    "src/ticket_classifier/api/schemas.py",
+    "src/ticket_classifier/api/errors.py"
+   ],
+   "teste": [
+    "tests/unit/test_api_errors.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/api/__init__.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-22"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "API-90",
+    "API-91",
+    "API-92",
+    "API-93",
+    "FDBK-92"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-023": {
+   "titulo": "Create API factory with model loading and health endpoint",
+   "tipo": "crud-padrão",
+   "risco": "alto",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "integration",
+   "depende_de": [
+    "TASK-004",
+    "TASK-009",
+    "TASK-011",
+    "TASK-016",
+    "TASK-019",
+    "TASK-022"
+   ],
+   "producao": [
+    "src/ticket_classifier/api/app.py",
+    "src/ticket_classifier/api/routes_health.py"
+   ],
+   "teste": [
+    "tests/support/api_fixtures.py",
+    "tests/integration/test_api_health.py"
+   ],
+   "wiring": [
+    "README.md"
+   ],
+   "contratos": [
+    "CT-11",
+    "CT-16",
+    "CT-19",
+    "CT-22",
+    "CT-23",
+    "CT-3",
+    "CT-4",
+    "CT-9"
+   ],
+   "ancora": [
+    "AS-6"
+   ],
+   "requisitos": [
+    "OPS-01",
+    "API-09",
+    "API-94",
+    "FDBK-93"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-024": {
+   "titulo": "Implement POST /predict with review flag and persistence",
+   "tipo": "lógica-negócio",
+   "risco": "crítico",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "integration",
+   "depende_de": [
+    "TASK-005",
+    "TASK-023"
+   ],
+   "producao": [
+    "src/ticket_classifier/services/prediction_service.py",
+    "src/ticket_classifier/api/routes_predict.py"
+   ],
+   "teste": [
+    "tests/unit/test_prediction_service.py",
+    "tests/integration/test_api_predict.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/services/__init__.py",
+    "src/ticket_classifier/api/app.py"
+   ],
+   "contratos": [
+    "CT-1",
+    "CT-19",
+    "CT-22",
+    "CT-23",
+    "CT-24",
+    "CT-3",
+    "CT-5"
+   ],
+   "ancora": [
+    "AS-3",
+    "AS-6"
+   ],
+   "requisitos": [
+    "API-01",
+    "API-02",
+    "API-03",
+    "API-04",
+    "API-05",
+    "API-06",
+    "API-07",
+    "API-08",
+    "API-90",
+    "API-91",
+    "API-92",
+    "API-93",
+    "API-94",
+    "API-95",
+    "API-96"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-025": {
+   "titulo": "Implement POST /feedback with API key",
+   "tipo": "crud-padrão",
+   "risco": "crítico",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "integration",
+   "depende_de": [
+    "TASK-020",
+    "TASK-023"
+   ],
+   "producao": [
+    "src/ticket_classifier/api/security.py",
+    "src/ticket_classifier/api/routes_feedback.py"
+   ],
+   "teste": [
+    "tests/unit/test_security.py",
+    "tests/integration/test_api_feedback.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/api/app.py"
+   ],
+   "contratos": [
+    "CT-20",
+    "CT-22",
+    "CT-23",
+    "CT-25",
+    "CT-4"
+   ],
+   "ancora": [
+    "AS-1",
+    "AS-7"
+   ],
+   "requisitos": [
+    "FDBK-01",
+    "FDBK-02",
+    "FDBK-04",
+    "FDBK-90",
+    "FDBK-91",
+    "FDBK-92",
+    "FDBK-93",
+    "FDBK-95"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-026": {
+   "titulo": "Schedule automatic purge in the API lifespan",
+   "tipo": "infra",
+   "risco": "crítico",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "unit",
+   "depende_de": [
+    "TASK-021",
+    "TASK-023"
+   ],
+   "producao": [
+    "src/ticket_classifier/api/purge_scheduler.py"
+   ],
+   "teste": [
+    "tests/unit/test_purge_scheduler.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/api/app.py"
+   ],
+   "contratos": [
+    "CT-19",
+    "CT-21",
+    "CT-23",
+    "CT-26",
+    "CT-4"
+   ],
+   "ancora": [
+    "AS-5"
+   ],
+   "requisitos": [
+    "OPS-08"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-027": {
+   "titulo": "Retrain with feedback and gated promotion",
+   "tipo": "lógica-negócio",
+   "risco": "médio",
+   "perfil": "backend",
+   "agente": "hm-engineer",
+   "testes": "integration",
+   "depende_de": [
+    "TASK-016",
+    "TASK-020"
+   ],
+   "producao": [
+    "src/ticket_classifier/retraining.py"
+   ],
+   "teste": [
+    "tests/integration/test_retraining.py"
+   ],
+   "wiring": [
+    "src/ticket_classifier/cli.py",
+    "README.md"
+   ],
+   "contratos": [
+    "CT-11",
+    "CT-16",
+    "CT-20",
+    "CT-27",
+    "CT-28",
+    "CT-4",
+    "CT-6",
+    "CT-8"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "RETR-01",
+    "RETR-02",
+    "RETR-03",
+    "RETR-04",
+    "RETR-90",
+    "RETR-91",
+    "RETR-92"
+   ],
+   "gate": null,
+   "paralelo_seguro": true
+  },
+  "TASK-028": {
+   "titulo": "Package the API as a CPU-only Docker image",
+   "tipo": "infra",
+   "risco": "médio",
+   "perfil": "infra",
+   "agente": "hm-engineer",
+   "testes": "e2e",
+   "depende_de": [
+    "TASK-024",
+    "TASK-025",
+    "TASK-026",
+    "TASK-027"
+   ],
+   "producao": [
+    "docker/Dockerfile",
+    "docker/Dockerfile.dockerignore"
+   ],
+   "teste": [
+    "tests/container/test_container_smoke.py"
+   ],
+   "wiring": [
+    "README.md"
+   ],
+   "contratos": [
+    "CT-23",
+    "CT-24",
+    "CT-25"
+   ],
+   "ancora": [],
+   "requisitos": [
+    "OPS-02"
+   ],
+   "gate": "`uv run pytest -m container tests/container/test_container_smoke.py` (executar em `.`)",
+   "paralelo_seguro": false
+  }
+ },
+ "ondas": [
+  {
+   "n": 1,
+   "tasks": [
+    "TASK-001"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {},
+   "perfil_qa_previsto": null
+  },
+  {
+   "n": 2,
+   "tasks": [
+    "TASK-004"
+   ],
+   "risco_max": "crítico",
+   "gatilhos_previstos": {
+    "G1": [
+     "TASK-004"
+    ]
+   },
+   "perfil_qa_previsto": "EXAUSTIVO"
+  },
+  {
+   "n": 3,
+   "tasks": [
+    "TASK-002",
+    "TASK-005"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {},
+   "perfil_qa_previsto": null
+  },
+  {
+   "n": 4,
+   "tasks": [
+    "TASK-003",
+    "TASK-006",
+    "TASK-007",
+    "TASK-011"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {
+    "G2": {
+     "CT-1": [
+      "TASK-003",
+      "TASK-007"
+     ],
+     "CT-2": [
+      "TASK-006",
+      "TASK-007",
+      "TASK-011"
+     ]
+    }
+   },
+   "perfil_qa_previsto": "PADRAO"
+  },
+  {
+   "n": 5,
+   "tasks": [
+    "TASK-013"
+   ],
+   "risco_max": "alto",
+   "gatilhos_previstos": {
+    "G1": [
+     "TASK-013"
+    ]
+   },
+   "perfil_qa_previsto": "RIGOROSO"
+  },
+  {
+   "n": 6,
+   "tasks": [
+    "TASK-008",
+    "TASK-010",
+    "TASK-012",
+    "TASK-015"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {
+    "G2": {
+     "CT-3": [
+      "TASK-010",
+      "TASK-012"
+     ],
+     "CT-1": [
+      "TASK-010",
+      "TASK-012"
+     ]
+    }
+   },
+   "perfil_qa_previsto": "PADRAO"
+  },
+  {
+   "n": 7,
+   "tasks": [
+    "TASK-009",
+    "TASK-014",
+    "TASK-019",
+    "TASK-022"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {
+    "G2": {
+     "CT-6": [
+      "TASK-009",
+      "TASK-014"
+     ],
+     "CT-1": [
+      "TASK-019",
+      "TASK-022"
+     ]
+    },
+    "G3": [
+     "P1: Preparar o dataset"
+    ]
+   },
+   "perfil_qa_previsto": "PADRAO"
+  },
+  {
+   "n": 8,
+   "tasks": [
+    "TASK-016",
+    "TASK-020"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {},
+   "perfil_qa_previsto": null
+  },
+  {
+   "n": 9,
+   "tasks": [
+    "TASK-021"
+   ],
+   "risco_max": "crítico",
+   "gatilhos_previstos": {
+    "G1": [
+     "TASK-021"
+    ]
+   },
+   "perfil_qa_previsto": "EXAUSTIVO"
+  },
+  {
+   "n": 10,
+   "tasks": [
+    "TASK-023"
+   ],
+   "risco_max": "alto",
+   "gatilhos_previstos": {
+    "G1": [
+     "TASK-023"
+    ]
+   },
+   "perfil_qa_previsto": "RIGOROSO"
+  },
+  {
+   "n": 11,
+   "tasks": [
+    "TASK-024"
+   ],
+   "risco_max": "crítico",
+   "gatilhos_previstos": {
+    "G1": [
+     "TASK-024"
+    ],
+    "G3": [
+     "P1: Classificar ticket via POST /predict"
+    ]
+   },
+   "perfil_qa_previsto": "EXAUSTIVO"
+  },
+  {
+   "n": 12,
+   "tasks": [
+    "TASK-025"
+   ],
+   "risco_max": "crítico",
+   "gatilhos_previstos": {
+    "G1": [
+     "TASK-025"
+    ],
+    "G3": [
+     "P1: Registrar a classificação correta"
+    ]
+   },
+   "perfil_qa_previsto": "EXAUSTIVO"
+  },
+  {
+   "n": 13,
+   "tasks": [
+    "TASK-026"
+   ],
+   "risco_max": "crítico",
+   "gatilhos_previstos": {
+    "G1": [
+     "TASK-026"
+    ]
+   },
+   "perfil_qa_previsto": "EXAUSTIVO"
+  },
+  {
+   "n": 14,
+   "tasks": [
+    "TASK-017"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {
+    "G3": [
+     "P1: Treinar e comparar modelos"
+    ]
+   },
+   "perfil_qa_previsto": "PADRAO"
+  },
+  {
+   "n": 15,
+   "tasks": [
+    "TASK-018"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {},
+   "perfil_qa_previsto": null
+  },
+  {
+   "n": 16,
+   "tasks": [
+    "TASK-027"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {},
+   "perfil_qa_previsto": null
+  },
+  {
+   "n": 17,
+   "tasks": [
+    "TASK-028"
+   ],
+   "risco_max": "médio",
+   "gatilhos_previstos": {},
+   "perfil_qa_previsto": null
+  }
+ ]
+}
