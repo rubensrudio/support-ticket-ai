@@ -19,7 +19,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
   - `tests/unit/test_cli.py`
 - **Wiring permitido**:
   - `src/ticket_classifier/__init__.py` (criar; só `__version__ = "0.1.0"`)
-  - `./.gitignore` (criar; entradas: `.venv/`, `reports/`, `dist/`, `data/raw/`, `data/processed/`, `artifacts/`, `var/`, `mlflow.db`, `mlartifacts/`, `mlruns/`, `__pycache__/`, `.mypy_cache/`, `.ruff_cache/`, `.pytest_cache/`)
+  - `.gitignore` (criar; entradas: `.venv/`, `reports/`, `dist/`, `data/raw/`, `data/processed/`, `artifacts/`, `var/`, `mlflow.db`, `mlartifacts/`, `mlruns/`, `__pycache__/`, `.mypy_cache/`, `.ruff_cache/`, `.pytest_cache/`)
   - `uv.lock` (gerado por `uv lock`; não editar à mão)
   - `README.md` (criar em inglês; seções "Overview", "Requirements", "Setup", "Development" com os comandos de lint/typecheck/test/build da seção 3 do plan, e "Tests run offline" explicando OPS-03)
 - **Reusa**: —

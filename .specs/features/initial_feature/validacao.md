@@ -24,7 +24,7 @@
 
 PRs previstos (uma fase termina numa onda com QA semântico; a última, no QA FEATURE): fase 1: ondas 1, 2 · fase 2: ondas 3, 4 · fase 3: ondas 5 · fase 4: ondas 6 · fase 5: ondas 7 · fase 6: ondas 8, 9 · fase 7: ondas 10 · fase 8: ondas 11 · fase 9: ondas 12 · fase 10: ondas 13 · fase 11: ondas 14 · fase 12: ondas 15, 16, 17
 
-Caminho crítico: TASK-001 → TASK-002 → TASK-003 → TASK-013 → TASK-014 → TASK-016 → TASK-023 → TASK-026 → TASK-028 (9 tasks)
+Caminho crítico: TASK-001 → TASK-002 → TASK-003 → TASK-013 → TASK-014 → TASK-016 → TASK-023 → TASK-024 → TASK-028 (9 tasks)
 G4 (gate cego) e G5 (retry) só são conhecidos na execução.
 
 ## Cobertura de requisitos
