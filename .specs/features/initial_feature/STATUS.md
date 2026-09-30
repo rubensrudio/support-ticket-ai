@@ -1,6 +1,6 @@
 # STATUS — initial_feature
 
-Atualizado em 2026-09-30T16:57:14 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
+Atualizado em 2026-09-30T17:56:33 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
 
 ## Baseline
 
@@ -31,7 +31,7 @@ Atualizado em 2026-09-30T16:57:14 · integradora `feature/initial_feature-integr
 | 14 | TASK-017 | ✅ | G3 | PADRAO: APROVADO |
 | 15 | TASK-018 | ✅ | — | NAO_INVOCADO |
 | 16 | TASK-027 | ✅ | — | NAO_INVOCADO |
-| 17 | TASK-028 | — | — | — |
+| 17 | TASK-028 | ✅ | G5 | PADRAO: APROVADO |
 
 ## Fases (PRs)
 
@@ -81,12 +81,12 @@ Atualizado em 2026-09-30T16:57:14 · integradora `feature/initial_feature-integr
 | TASK-025 | ✅ APROVADA | crítico | 0/0/1 |  |
 | TASK-026 | ✅ APROVADA | crítico | 0/0/0 |  |
 | TASK-027 | ✅ APROVADA | médio | 0/0/0 |  |
-| TASK-028 |  PENDENTE | médio | 0/0/0 |  |
+| TASK-028 | ✅ APROVADA | médio | 1/0/1 |  |
 
 ## Métricas
 
-- Aprovadas: 27/28 · bloqueadas: 0
-- Aprovadas em 1ª rodada: 23/27
-- Ondas fechadas: 16 · QA semântico invocado em 12
+- Aprovadas: 28/28 · bloqueadas: 0
+- Aprovadas em 1ª rodada: 23/28
+- Ondas fechadas: 17 · QA semântico invocado em 13
 - Regressões capturadas pelo gate mecânico: 0
 - Testes e2e de regressão criados a partir de achados do QA: 0
