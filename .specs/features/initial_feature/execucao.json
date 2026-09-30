@@ -1,10 +1,10 @@
 {
  "versao": 2,
  "feature": "initial_feature",
- "gerado_em": "2026-09-30T11:34:51",
+ "gerado_em": "2026-09-30T12:10:05",
  "hashes": {
-  "plan": "4da657696bac149d",
-  "tasks": "3c08a56b7ecacc0e"
+  "plan": "b2449f6c04d74168",
+  "tasks": "829436c2c9618ecd"
  },
  "comandos": [
   {
@@ -28,13 +28,13 @@
   {
    "alvo": "test",
    "dir": ".",
-   "cmd": "uv run pytest",
+   "cmd": "uv run pytest --junitxml=reports/junit.xml",
    "relatorio": "reports/junit.xml"
   },
   {
    "alvo": "test_related",
    "dir": ".",
-   "cmd": "uv run pytest {files}",
+   "cmd": "uv run pytest --junitxml=reports/junit.xml {files}",
    "relatorio": "reports/junit.xml"
   },
   {
@@ -1138,7 +1138,7 @@
    "requisitos": [
     "OPS-02"
    ],
-   "gate": "`uv run pytest -m container tests/container/test_container_smoke.py` (executar em `.`)",
+   "gate": "`uv run pytest --junitxml=reports/junit.xml -m container tests/container/test_container_smoke.py` (executar em `.`)",
    "paralelo_seguro": false
   }
  },
