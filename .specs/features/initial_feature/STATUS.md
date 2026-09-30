@@ -1,6 +1,6 @@
 # STATUS — initial_feature
 
-Atualizado em 2026-09-30T20:09:01 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
+Atualizado em 2026-10-01T09:09:17 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
 
 ## Baseline
 
@@ -91,4 +91,4 @@ Atualizado em 2026-09-30T20:09:01 · integradora `feature/initial_feature-integr
 - Ondas fechadas: 17 · QA semântico invocado em 13
 - Regressões capturadas pelo gate mecânico: 0
 - Testes e2e de regressão criados a partir de achados do QA: 0
-- Gate final: ✅ em 2026-09-30T19:53 (HEAD e0893bc)
+- Gate final: ✅ em 2026-10-01T09:06 (HEAD 07247c9)
