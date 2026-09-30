@@ -76,7 +76,9 @@ def _row(
     return row
 
 
-def make_source_rows(per_category: int = SAMPLE_PER_CATEGORY, seed: int = 7) -> list[dict[str, str]]:
+def make_source_rows(
+    per_category: int = SAMPLE_PER_CATEGORY, seed: int = 7
+) -> list[dict[str, str]]:
     """Build source CSV rows; see the module docstring for the composition."""
     rng = random.Random(seed)
     rows: list[dict[str, str]] = []

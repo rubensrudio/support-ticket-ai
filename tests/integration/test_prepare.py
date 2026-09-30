@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from support.sample_data import (
     CATEGORY_SOURCES,
     LABEL_MAPPING_PATH,
@@ -15,6 +14,7 @@ from support.sample_data import (
     write_pipeline_config,
     write_source_csv,
 )
+
 from ticket_classifier.cli import main
 from ticket_classifier.data.label_mapping import UnmappedLabelError
 from ticket_classifier.data.prepare import (
@@ -231,7 +231,9 @@ def test_cli_prepare_returns_zero(tmp_path: Path) -> None:
     source = write_source_csv(tmp_path / "raw" / "tickets.csv", make_source_rows())
     config_path = write_pipeline_config(tmp_path, source)
 
-    exit_code = main(["prepare", "--config", str(config_path), "--mapping", str(LABEL_MAPPING_PATH)])
+    exit_code = main(
+        ["prepare", "--config", str(config_path), "--mapping", str(LABEL_MAPPING_PATH)]
+    )
 
     assert exit_code == 0
     for name in SPLIT_NAMES:
@@ -254,7 +256,9 @@ def test_cli_prepare_missing_source_returns_one(
     missing = tmp_path / "raw" / "absent.csv"
     config_path = write_pipeline_config(tmp_path, missing)
 
-    exit_code = main(["prepare", "--config", str(config_path), "--mapping", str(LABEL_MAPPING_PATH)])
+    exit_code = main(
+        ["prepare", "--config", str(config_path), "--mapping", str(LABEL_MAPPING_PATH)]
+    )
 
     assert exit_code == 1
     assert capsys.readouterr().err.strip() == (
