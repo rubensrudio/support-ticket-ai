@@ -19,7 +19,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import SecretStr
 from support.api_fixtures import TEST_API_KEY, build_promoted_baseline
+from support.sample_data import prepare_sample
+
+from ticket_classifier.registry import ModelRegistry
+from ticket_classifier.settings import Settings
+from ticket_classifier.training import train_and_register
 
 pytestmark = pytest.mark.container
 
@@ -141,3 +147,47 @@ def test_ops02_health_and_predict_in_container(running_api: str) -> None:
     assert status == 200, prediction
     assert prediction["prediction_id"]
     assert prediction["model_version"] == health["model_version"]
+
+
+def _readme_docker_section() -> str:
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    start = readme.index("## Run with Docker")
+    end = readme.find("\n## ", start + 1)
+    # Collapse Markdown line wrapping so phrases can be matched across lines.
+    return " ".join(readme[start : end if end != -1 else len(readme)].split())
+
+
+def test_api09_readme_docker_repeats_chmod_after_promotion() -> None:
+    section = _readme_docker_section()
+    assert "chmod -R a+rX artifacts" in section
+    assert "every train, promote or retrain" in section
+    assert "before (re)starting the container" in section
+    assert "Cannot read the model registry." in section
+
+
+def test_api09_restart_after_promotion_serves_new_version(running_api: str, tmp_path: Path) -> None:
+    status, health = _request("GET", "/health")
+    assert status == 200, health
+    first_version = health["model_version"]
+
+    # Promote a new version on the host, as `train-baseline`/`retrain` would do.
+    settings = Settings(
+        api_key=SecretStr(TEST_API_KEY),
+        artifacts_dir=tmp_path / "artifacts",
+        db_path=tmp_path / "db" / "tickets.db",
+    )
+    config = prepare_sample(tmp_path / "sample-next")
+    outcome = train_and_register("baseline", config, settings)
+    ModelRegistry(settings.artifacts_dir).promote(outcome.version.version_id)
+    assert settings.artifacts_dir.joinpath("registry.json").stat().st_mode & 0o044 == 0
+
+    # Documented step: repeat the chmod before restarting the container.
+    _make_world_readable(settings.artifacts_dir)
+    restart = _docker("restart", running_api)
+    assert restart.returncode == 0, restart.stderr[-2000:]
+    _wait_until_ready(running_api)
+
+    status, health = _request("GET", "/health")
+    assert status == 200, health
+    assert health["model_version"] == outcome.version.version_id
+    assert health["model_version"] != first_version
