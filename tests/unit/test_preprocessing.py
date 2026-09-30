@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from ticket_classifier.preprocessing import (
@@ -165,3 +167,16 @@ def test_data07_digits_inside_email_and_url_stay_email_and_url() -> None:
     raw = "a555-123-4567@x.com and https://x.com/555-123-4567"
 
     assert preprocess_text(raw) == "[EMAIL] and [URL]"
+
+
+@pytest.mark.parametrize(
+    "raw",
+    ["1" * 40000 + "a", "a" * 40000, "a1-" * 13000, "x.y" * 13000 + "@"],
+    ids=["digits", "letters", "glued-groups", "no-domain"],
+)
+def test_data07_long_inputs_are_processed_in_linear_time(raw: str) -> None:
+    started = time.perf_counter()
+    once = preprocess_text(raw)
+
+    assert time.perf_counter() - started < 0.5
+    assert preprocess_text(once) == once

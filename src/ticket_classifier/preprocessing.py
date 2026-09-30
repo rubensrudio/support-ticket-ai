@@ -16,7 +16,11 @@ NUMBER_MARKER = "[NUMBER]"
 
 _WHITESPACE_RE = re.compile(r"\s+")
 
-_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}")
+# The lookbehind anchors the match at the start of a local-part run; without it
+# a long run with no "@" is rescanned from every position (quadratic time).
+_EMAIL_RE = re.compile(
+    r"(?<![A-Za-z0-9._%+\-])[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(?:\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}"
+)
 _URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
 
 # Candidate phone: optional "+", then digit groups (optionally in parentheses)
