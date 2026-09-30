@@ -1,6 +1,6 @@
 # STATUS — initial_feature
 
-Atualizado em 2026-09-30T12:40:39 · integradora `feature/initial_feature-integration` · baseline `develop@8cacadf` (2026-09-30)
+Atualizado em 2026-09-30T12:46:29 · integradora `feature/initial_feature-integration` · baseline `develop@8cacadf` (2026-09-30)
 
 ## Baseline
 
@@ -18,7 +18,7 @@ Atualizado em 2026-09-30T12:40:39 · integradora `feature/initial_feature-integr
 | 1 | TASK-001 | ✅ | — | NAO_INVOCADO |
 | 2 | TASK-004 | ✅ | G1 | EXAUSTIVO: APROVADO |
 | 3 | TASK-002, TASK-005 | ✅ | G5 | PADRAO: APROVADO |
-| 4 | TASK-003, TASK-006, TASK-007, TASK-011 | — | — | — |
+| 4 | TASK-003, TASK-006, TASK-007, TASK-011 | ✅ | G2 | PADRAO: APROVADO |
 | 5 | TASK-013 | — | — | — |
 | 6 | TASK-008, TASK-010, TASK-012, TASK-015 | — | — | — |
 | 7 | TASK-009, TASK-014, TASK-019, TASK-022 | — | — | — |
@@ -38,6 +38,7 @@ Atualizado em 2026-09-30T12:40:39 · integradora `feature/initial_feature-integr
 | Fase | Ondas | Tasks | Branch → base | PR |
 |---|---|---|---|---|
 | 1 | 1, 2 | TASK-001, TASK-004 | `feature/initial_feature-phase-1` → `develop` | https://github.com/rubensrudio/support-ticket-ai/pull/1 |
+| 2 | 3 | TASK-002, TASK-005 | `feature/initial_feature-phase-2` → `feature/initial_feature-phase-1` | https://github.com/rubensrudio/support-ticket-ai/pull/2 |
 
 ## Tasks
 
@@ -45,15 +46,15 @@ Atualizado em 2026-09-30T12:40:39 · integradora `feature/initial_feature-integr
 |---|---|---|---|---|
 | TASK-001 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-002 | ✅ APROVADA | médio | 0/0/0 |  |
-| TASK-003 |  PENDENTE | médio | 0/0/0 |  |
+| TASK-003 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-004 | ✅ APROVADA | crítico | 0/0/0 |  |
 | TASK-005 | ✅ APROVADA | médio | 1/0/1 |  |
-| TASK-006 |  PENDENTE | médio | 0/0/0 |  |
-| TASK-007 |  PENDENTE | médio | 0/0/0 |  |
+| TASK-006 | ✅ APROVADA | médio | 0/0/0 |  |
+| TASK-007 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-008 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-009 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-010 |  PENDENTE | médio | 0/0/0 |  |
-| TASK-011 |  PENDENTE | médio | 0/0/0 |  |
+| TASK-011 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-012 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-013 |  PENDENTE | alto | 0/0/0 |  |
 | TASK-014 |  PENDENTE | médio | 0/0/0 |  |
@@ -74,8 +75,8 @@ Atualizado em 2026-09-30T12:40:39 · integradora `feature/initial_feature-integr
 
 ## Métricas
 
-- Aprovadas: 4/28 · bloqueadas: 0
-- Aprovadas em 1ª rodada: 3/4
-- Ondas fechadas: 3 · QA semântico invocado em 2
+- Aprovadas: 8/28 · bloqueadas: 0
+- Aprovadas em 1ª rodada: 7/8
+- Ondas fechadas: 4 · QA semântico invocado em 3
 - Regressões capturadas pelo gate mecânico: 0
 - Testes e2e de regressão criados a partir de achados do QA: 0
