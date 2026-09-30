@@ -102,6 +102,44 @@ Artifacts:
 > Hugging Face Hub on first use. The test suite uses a local tiny model and never
 > downloads anything.
 
+## Run the API
+
+Start the REST API locally (the app is built by a factory, hence `--factory`):
+
+```bash
+uv run uvicorn ticket_classifier.api.app:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+At startup the API creates the SQLite schema at `TICKET_DB_PATH` and loads the promoted
+model version from the registry once. A version promoted while the API is running is
+only served after a restart. If no promoted version can be loaded (no `registry.json`,
+nothing promoted, or missing artifacts), the API still starts and reports itself as
+unavailable. If `TICKET_API_KEY` is not set, the startup log contains
+`API key not configured: /feedback will reject all requests.`
+
+Health check (public, no API key required):
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+- `200 {"status": "ok", "model_version": "<version_id>"}` when a model is loaded;
+- `503 {"status": "unavailable", "model_version": null}` otherwise.
+
+## Configuration
+
+Runtime settings are read from environment variables:
+
+| Variable                        | Default               | Description |
+|---------------------------------|-----------------------|-------------|
+| `TICKET_API_KEY`                | not set               | Key expected in the `X-API-Key` header of `POST /feedback`. Empty or unset means not configured: `/feedback` rejects every request. |
+| `TICKET_REVIEW_THRESHOLD`       | `0.6`                 | Low-confidence threshold (`0.0` to `1.0`): a prediction whose category or priority confidence is below it gets `needs_review = true`. |
+| `TICKET_DB_PATH`                | `var/tickets.db`      | SQLite database for predictions and feedback. The parent directory is created if needed. |
+| `TICKET_ARTIFACTS_DIR`          | `artifacts`           | Root of the model artifacts and `registry.json`. |
+| `TICKET_RETENTION_DAYS`         | `90`                  | Days a prediction without feedback is kept before it is purged (at least `1`). |
+| `TICKET_PURGE_INTERVAL_SECONDS` | `86400`               | Interval between purge runs, in seconds (at least `1`). |
+| `MLFLOW_TRACKING_URI`           | `sqlite:///mlflow.db` | MLflow tracking store, used by the training commands only (not by the API). |
+
 ## Development
 
 | Task      | Command                                              |
