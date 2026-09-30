@@ -5,6 +5,7 @@ calls ``parser.set_defaults(handler=<function(args) -> int>)``.
 """
 
 import argparse
+import sqlite3
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -15,6 +16,8 @@ from ticket_classifier.errors import PipelineError
 from ticket_classifier.pipeline_config import load_pipeline_config
 from ticket_classifier.registry import ModelRegistry
 from ticket_classifier.settings import get_settings
+from ticket_classifier.storage.database import connect, init_schema, utc_now
+from ticket_classifier.storage.purge import PURGE_MESSAGE, purge_expired_predictions
 
 _PROG = "ticket-classifier"
 _USAGE_ERROR = 2
@@ -32,6 +35,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", metavar="<command>")
     _add_list_versions_command(subparsers)
     _add_prepare_command(subparsers)
+    _add_purge_command(subparsers)
     _add_train_baseline_command(subparsers)
     _add_train_transformer_command(subparsers)
     return parser
@@ -156,6 +160,30 @@ def _run_list_versions(args: argparse.Namespace) -> int:
         print(
             "  ".join(cell.ljust(width) for cell, width in zip(row, widths, strict=True)).rstrip()
         )
+    return 0
+
+
+def _add_purge_command(subparsers: "argparse._SubParsersAction[Any]") -> None:
+    parser = subparsers.add_parser(
+        "purge",
+        help="Delete stored predictions without feedback older than the retention period.",
+    )
+    parser.set_defaults(handler=_run_purge)
+
+
+def _run_purge(args: argparse.Namespace) -> int:
+    settings = get_settings()
+    try:
+        conn = connect(settings.db_path)
+        try:
+            init_schema(conn)
+            count = purge_expired_predictions(conn, utc_now(), settings.retention_days)
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        print("Purge failed: the prediction database could not be accessed.", file=sys.stderr)
+        return _PIPELINE_ERROR
+    print(PURGE_MESSAGE.format(count=count, days=settings.retention_days))
     return 0
 
 
