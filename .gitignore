@@ -1,0 +1,14 @@
+.venv/
+reports/
+dist/
+data/raw/
+data/processed/
+artifacts/
+var/
+mlflow.db
+mlartifacts/
+mlruns/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
