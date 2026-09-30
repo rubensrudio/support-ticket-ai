@@ -1,0 +1,47 @@
+# Source label -> canonical label mapping (decision LAC-32 = A, DA-4).
+version = "1"
+
+[priority]            # every source priority must be listed here (DATA-91)
+low = "low"
+medium = "medium"
+high = "high"
+very_low = "low"
+critical = "high"
+
+[category.queue]      # every source queue must be listed here (DATA-91)
+"Billing and Payments" = "billing"
+"Service Outages and Maintenance" = "infrastructure"
+"Technical Support" = "other"
+"Product Support" = "other"
+"Customer Service" = "other"
+"IT Support" = "other"
+"Returns and Exchanges" = "other"
+"Sales and Pre-Sales" = "other"
+"Human Resources" = "other"
+"General Inquiry" = "other"
+
+# Rules are evaluated in order; the first match wins; otherwise [category.queue] applies.
+[[category.rules]]
+name = "billing-queue"
+queue_in = ["Billing and Payments"]
+category = "billing"
+
+[[category.rules]]
+name = "access-tags"
+any_tag_in = ["Login", "Account", "Access", "Password", "Authentication"]
+category = "access"
+
+[[category.rules]]
+name = "outage-queue"
+queue_in = ["Service Outages and Maintenance"]
+category = "infrastructure"
+
+[[category.rules]]
+name = "bug-tags"
+any_tag_in = ["Bug", "Crash"]
+category = "bug"
+
+[[category.rules]]
+name = "infrastructure-tags"
+any_tag_in = ["Outage", "Network", "Hardware", "Server", "Disruption"]
+category = "infrastructure"
