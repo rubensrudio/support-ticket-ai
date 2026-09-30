@@ -277,3 +277,35 @@ def test_api07_logs_prediction_metadata_without_ticket_text(
     messages = [r.getMessage() for r in caplog.records]
     assert any(response.json()["prediction_id"] in m for m in messages)
     assert all("Secret title" not in m and "Confidential" not in m for m in messages)
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    [
+        ({"title": "\u0000\u0001", "description": "d"}, "Field 'title' must not be blank."),
+        (
+            {"title": "Valid title", "description": "\u0000"},
+            "Field 'description' must not be blank.",
+        ),
+    ],
+)
+def test_api92_lac36_blank_after_preprocessing_returns_422_without_storing(
+    client: TestClient, settings: Settings, payload: dict[str, str], message: str
+) -> None:
+    calls: list[object] = []
+    fake = FakeClassifier()
+    original = fake.predict_proba
+
+    def tracking(titles: Sequence[str], descriptions: Sequence[str]) -> list[ClassProbabilities]:
+        calls.append((titles, descriptions))
+        return original(titles, descriptions)
+
+    fake.predict_proba = tracking  # type: ignore[method-assign]
+    _state(client).classifier = fake
+
+    response = client.post("/predict", json=payload)
+
+    assert response.status_code == 422
+    assert response.json() == {"code": "VALIDATION_ERROR", "message": message}
+    assert calls == []
+    assert _rows(settings.db_path) == []

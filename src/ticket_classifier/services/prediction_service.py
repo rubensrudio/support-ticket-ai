@@ -27,6 +27,14 @@ class PredictionStorageError(Exception):
     """The prediction could not be stored (API-96)."""
 
 
+class BlankFieldError(Exception):
+    """A field became empty after preprocessing (API-92, LAC-36)."""
+
+    def __init__(self, field: str) -> None:
+        super().__init__(f"Field '{field}' is blank after preprocessing.")
+        self.field = field
+
+
 def _top_categories(probs: dict[str, float]) -> list[TopCategory]:
     # Stable sort over the CT-1 order: equal probabilities keep that order, which
     # matches the tie-break of ``top_label``.
@@ -42,17 +50,23 @@ def predict_ticket(
 ) -> PredictResponse:
     """Classify one ticket, store the masked prediction and return the API response.
 
-    Raises ``ModelUnavailableError`` when no model is loaded and
-    ``PredictionStorageError`` when the prediction cannot be stored; in both cases
-    nothing is returned to the caller.
+    Raises ``ModelUnavailableError`` when no model is loaded, ``BlankFieldError``
+    when a field is empty after preprocessing (nothing is inferred or stored) and
+    ``PredictionStorageError`` when the prediction cannot be stored.
     """
+    # LAC-36: API-92 also applies to text left empty by preprocessing (DATA-08).
+    # Checked first so validation wins over 503, as with schema validation.
+    title_masked = preprocess_text(title)
+    description_masked = preprocess_text(description)
+    if not title_masked:
+        raise BlankFieldError("title")
+    if not description_masked:
+        raise BlankFieldError("description")
+
     classifier = state.classifier
     model_version = state.model_version
     if classifier is None or model_version is None:
         raise ModelUnavailableError("No promoted model version is loaded.")
-
-    title_masked = preprocess_text(title)
-    description_masked = preprocess_text(description)
     probs = classifier.predict_proba([title_masked], [description_masked])[0]
 
     category, category_confidence = top_label(probs.category, CATEGORIES)

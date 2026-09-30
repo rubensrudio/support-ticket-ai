@@ -11,6 +11,7 @@ from ticket_classifier.labels import CATEGORIES
 from ticket_classifier.models.base import ClassProbabilities
 from ticket_classifier.services import prediction_service
 from ticket_classifier.services.prediction_service import (
+    BlankFieldError,
     ModelUnavailableError,
     PredictionStorageError,
     predict_ticket,
@@ -228,3 +229,30 @@ def test_api96_closed_connection_becomes_prediction_storage_error(
 
     with pytest.raises(PredictionStorageError):
         predict_ticket(state, conn, "t", "d")
+
+
+@pytest.mark.parametrize(
+    ("title", "description", "field"),
+    [("\u0000\u0001", "d", "title"), ("Valid title", "\u0000", "description")],
+)
+def test_api92_lac36_blank_after_preprocessing_raises_without_inference_or_storage(
+    tmp_path: Path, conn: sqlite3.Connection, title: str, description: str, field: str
+) -> None:
+    classifier = FakeClassifier()
+    state = _state(tmp_path, classifier)
+
+    with pytest.raises(BlankFieldError) as excinfo:
+        predict_ticket(state, conn, title, description)
+
+    assert excinfo.value.field == field
+    assert classifier.calls == []
+    assert _rows(conn) == []
+
+
+def test_api92_lac36_blank_check_precedes_model_unavailable(
+    tmp_path: Path, conn: sqlite3.Connection
+) -> None:
+    state = _state(tmp_path, None, model_version=None)
+
+    with pytest.raises(BlankFieldError):
+        predict_ticket(state, conn, "\u0000", "d")
