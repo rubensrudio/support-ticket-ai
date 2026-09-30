@@ -1,0 +1,29 @@
+seed = 42
+[data]
+source_path = "data/raw/tickets.csv"
+processed_dir = "data/processed"
+title_column = "subject"
+description_column = "body"
+language_column = "language"
+language = "en"
+queue_column = "queue"
+priority_column = "priority"
+tag_columns = ["tag_1", "tag_2", "tag_3", "tag_4", "tag_5", "tag_6", "tag_7", "tag_8"]
+train_ratio = 0.70
+validation_ratio = 0.15
+test_ratio = 0.15
+min_train_examples_per_category = 100
+[baseline]
+c_grid = [0.1, 1.0, 10.0]
+ngram_max = 2
+min_df = 2
+max_features = 50000
+[transformer]
+model_name = "distilbert-base-uncased"
+max_length = 256
+epochs = 3
+batch_size = 16
+learning_rate = 5e-5
+weight_decay = 0.01
+warmup_ratio = 0.1
+num_threads = 4
