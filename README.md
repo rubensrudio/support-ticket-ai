@@ -102,6 +102,30 @@ Artifacts:
 > Hugging Face Hub on first use. The test suite uses a local tiny model and never
 > downloads anything.
 
+## Results
+
+Compare the most recent Baseline and Transformer versions (or specific ones with
+`--baseline ID` and `--transformer ID`) using the metrics recorded in the registry for
+the `test` split. Models are not re-evaluated:
+
+```bash
+uv run ticket-classifier compare
+```
+
+The command writes `artifacts/reports/comparison.md` and `artifacts/reports/comparison.json`
+(the root is `--artifacts-dir`, default `artifacts`) and prints a summary table with
+`Verdict: PASS` or `Verdict: FAIL` (exit code 0 in both cases). The report shows, per
+target (`category`, `priority`), accuracy, Macro F1, precision/recall/F1 per class and
+the confusion matrix of both models, plus the Macro F1 difference in percentage points.
+
+Verdict rule: `PASS` if the Transformer `category` Macro F1 is at least the Baseline one
+plus 5 percentage points **and** the Transformer `priority` Macro F1 is at least the
+Baseline one; `FAIL` otherwise.
+
+The command exits with code 1 if no version of a kind is registered
+(`No '<kind>' model version registered. Train it first.`) or if the two versions were
+evaluated on different splits (`Model versions were evaluated on different splits.`).
+
 ## Run the API
 
 Start the REST API locally (the app is built by a factory, hence `--factory`):
