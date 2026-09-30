@@ -6,15 +6,17 @@ version is loaded once at startup and never reloaded while the process runs
 (LAC-24); if it cannot be loaded the API still starts without a model (LAC-21).
 """
 
+import asyncio
 import logging
 import sqlite3
 from collections.abc import AsyncIterator, Iterator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass
 
 from fastapi import FastAPI, Request
 
 from ticket_classifier.api.errors import register_error_handlers
+from ticket_classifier.api.purge_scheduler import start_purge_loop
 from ticket_classifier.models.base import TicketClassifier
 from ticket_classifier.models.loader import load_classifier
 from ticket_classifier.registry import ModelRegistry
@@ -75,7 +77,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.ctx = AppState(
             settings=resolved, classifier=classifier, model_version=model_version
         )
-        yield
+        purge_task = start_purge_loop(resolved)
+        try:
+            yield
+        finally:
+            purge_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await purge_task
 
     # Routers import this module for their dependencies; import them here to
     # avoid a circular import at module load time.
