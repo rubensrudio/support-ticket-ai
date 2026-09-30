@@ -8,12 +8,13 @@ import argparse
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from ticket_classifier.data.prepare import prepare_dataset
 from ticket_classifier.errors import PipelineError
 from ticket_classifier.pipeline_config import load_pipeline_config
 from ticket_classifier.registry import ModelRegistry
+from ticket_classifier.settings import get_settings
 
 _PROG = "ticket-classifier"
 _USAGE_ERROR = 2
@@ -31,6 +32,8 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", metavar="<command>")
     _add_list_versions_command(subparsers)
     _add_prepare_command(subparsers)
+    _add_train_baseline_command(subparsers)
+    _add_train_transformer_command(subparsers)
     return parser
 
 
@@ -59,6 +62,52 @@ def _run_prepare(args: argparse.Namespace) -> int:
     print(
         f"Prepared splits in {config.data.processed_dir} "
         f"(splits_version {report['splits_version']})."
+    )
+    return 0
+
+
+def _add_train_config_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=Path("configs/pipeline.toml"),
+        help="Pipeline configuration file (default: configs/pipeline.toml).",
+    )
+
+
+def _add_train_baseline_command(subparsers: "argparse._SubParsersAction[Any]") -> None:
+    parser = subparsers.add_parser(
+        "train-baseline", help="Train, evaluate and register a Baseline model version."
+    )
+    _add_train_config_argument(parser)
+    parser.set_defaults(handler=_run_train_baseline)
+
+
+def _add_train_transformer_command(subparsers: "argparse._SubParsersAction[Any]") -> None:
+    parser = subparsers.add_parser(
+        "train-transformer", help="Train, evaluate and register a Transformer model version."
+    )
+    _add_train_config_argument(parser)
+    parser.set_defaults(handler=_run_train_transformer)
+
+
+def _run_train_baseline(args: argparse.Namespace) -> int:
+    return _run_training("baseline", args.config)
+
+
+def _run_train_transformer(args: argparse.Namespace) -> int:
+    return _run_training("transformer", args.config)
+
+
+def _run_training(kind: Literal["baseline", "transformer"], config_path: Path) -> int:
+    # Imported lazily: training pulls in torch, transformers and mlflow.
+    from ticket_classifier.training import train_and_register
+
+    config = load_pipeline_config(config_path)
+    outcome = train_and_register(kind, config, get_settings())
+    promoted = "yes" if outcome.promoted else "no"
+    print(
+        f"Registered model version '{outcome.version.version_id}' ({kind}). Promoted: {promoted}."
     )
     return 0
 
