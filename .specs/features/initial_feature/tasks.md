@@ -423,6 +423,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-013 — Build multi-head Transformer classifier
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-02`, `API-06`
 - **Tipo**: lógica-negócio

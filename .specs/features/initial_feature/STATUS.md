@@ -1,6 +1,6 @@
 # STATUS — initial_feature
 
-Atualizado em 2026-09-30T12:46:29 · integradora `feature/initial_feature-integration` · baseline `develop@8cacadf` (2026-09-30)
+Atualizado em 2026-09-30T12:56:22 · integradora `feature/initial_feature-integration` · baseline `develop@8cacadf` (2026-09-30)
 
 ## Baseline
 
@@ -19,7 +19,7 @@ Atualizado em 2026-09-30T12:46:29 · integradora `feature/initial_feature-integr
 | 2 | TASK-004 | ✅ | G1 | EXAUSTIVO: APROVADO |
 | 3 | TASK-002, TASK-005 | ✅ | G5 | PADRAO: APROVADO |
 | 4 | TASK-003, TASK-006, TASK-007, TASK-011 | ✅ | G2 | PADRAO: APROVADO |
-| 5 | TASK-013 | — | — | — |
+| 5 | TASK-013 | ✅ | G1 | RIGOROSO: APROVADO |
 | 6 | TASK-008, TASK-010, TASK-012, TASK-015 | — | — | — |
 | 7 | TASK-009, TASK-014, TASK-019, TASK-022 | — | — | — |
 | 8 | TASK-016, TASK-020 | — | — | — |
@@ -39,6 +39,7 @@ Atualizado em 2026-09-30T12:46:29 · integradora `feature/initial_feature-integr
 |---|---|---|---|---|
 | 1 | 1, 2 | TASK-001, TASK-004 | `feature/initial_feature-phase-1` → `develop` | https://github.com/rubensrudio/support-ticket-ai/pull/1 |
 | 2 | 3 | TASK-002, TASK-005 | `feature/initial_feature-phase-2` → `feature/initial_feature-phase-1` | https://github.com/rubensrudio/support-ticket-ai/pull/2 |
+| 3 | 4 | TASK-003, TASK-006, TASK-007, TASK-011 | `feature/initial_feature-phase-3` → `feature/initial_feature-phase-2` | https://github.com/rubensrudio/support-ticket-ai/pull/3 |
 
 ## Tasks
 
@@ -56,7 +57,7 @@ Atualizado em 2026-09-30T12:46:29 · integradora `feature/initial_feature-integr
 | TASK-010 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-011 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-012 |  PENDENTE | médio | 0/0/0 |  |
-| TASK-013 |  PENDENTE | alto | 0/0/0 |  |
+| TASK-013 | ✅ APROVADA | alto | 0/0/0 |  |
 | TASK-014 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-015 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-016 |  PENDENTE | médio | 0/0/0 |  |
@@ -75,8 +76,8 @@ Atualizado em 2026-09-30T12:46:29 · integradora `feature/initial_feature-integr
 
 ## Métricas
 
-- Aprovadas: 8/28 · bloqueadas: 0
-- Aprovadas em 1ª rodada: 7/8
-- Ondas fechadas: 4 · QA semântico invocado em 3
+- Aprovadas: 9/28 · bloqueadas: 0
+- Aprovadas em 1ª rodada: 8/9
+- Ondas fechadas: 5 · QA semântico invocado em 4
 - Regressões capturadas pelo gate mecânico: 0
 - Testes e2e de regressão criados a partir de achados do QA: 0
