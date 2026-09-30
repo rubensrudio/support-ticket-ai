@@ -832,6 +832,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-024 — Implement POST /predict with review flag and persistence
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `API-01`, `API-02`, `API-03`, `API-04`, `API-05`, `API-06`, `API-07`, `API-08`, `API-90`, `API-91`, `API-92`, `API-93`, `API-94`, `API-95`, `API-96`
 - **Tipo**: lógica-negócio
