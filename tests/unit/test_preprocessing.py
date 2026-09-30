@@ -136,3 +136,32 @@ def test_data07_long_digit_run_followed_by_letter_is_fast() -> None:
     assert mask_pii("1" * 5000 + "a") == "[NUMBER]a"
     assert mask_pii("12-" * 2000 + "a") == "[NUMBER]-a"
     assert mask_pii("1" * 5000 + " x") == "[NUMBER] x"
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("tel555-123-4567", "tel[PHONE]"),
+        ("_555-123-4567", "_[PHONE]"),
+        ("Tel:555-123-4567", "Tel:[PHONE]"),
+        ("x+1 555 123 4567", "x[PHONE]"),
+        ("555-123-4567abc", "[PHONE]abc"),
+        ("id_1234-5678-9012-3456_x", "id_[NUMBER]_x"),
+    ],
+)
+def test_data07_phone_glued_to_word_chars_is_masked(raw: str, expected: str) -> None:
+    masked = preprocess_text(raw)
+
+    assert masked == expected
+    assert preprocess_text(masked) == masked
+
+
+@pytest.mark.parametrize("raw", ["v1.2.3", "build v10.20.30-rc1", "addr 0xFF12"])
+def test_data07_short_versions_and_hex_are_untouched(raw: str) -> None:
+    assert preprocess_text(raw) == raw
+
+
+def test_data07_digits_inside_email_and_url_stay_email_and_url() -> None:
+    raw = "a555-123-4567@x.com and https://x.com/555-123-4567"
+
+    assert preprocess_text(raw) == "[EMAIL] and [URL]"
