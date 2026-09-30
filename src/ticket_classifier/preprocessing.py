@@ -23,7 +23,8 @@ _URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
 # joined by one to three separators among space, "." and "-". A parenthesized
 # group may touch its neighbours without a separator. Two plain digit runs never
 # touch, which keeps matching linear (no catastrophic backtracking). The digit
-# count and the separator/plus requirement are checked in ``_replace_phone``.
+# count and the separator/plus requirement are checked in ``_replace_phone``;
+# candidates over 15 digits become ``[NUMBER]``.
 _DIGIT_GROUP = r"(?:\(\d+\)|\d+)"
 _PHONE_NEXT_GROUP = rf"(?:[ .\-]{{1,3}}{_DIGIT_GROUP}|\(\d+\)|(?<=\))\d+)"
 _PHONE_CANDIDATE_RE = re.compile(
@@ -49,9 +50,17 @@ def normalize_text(text: str) -> str:
 
 
 def _replace_phone(match: re.Match[str]) -> str:
+    """Mask a phone candidate.
+
+    A candidate with more than 15 digits (a phone followed by more digits, or a
+    card/account number written in groups) is masked whole as ``[NUMBER]`` so
+    no phone or long identifier leaks (LAC-33, LAC-34).
+    """
     candidate = match.group(0)
     digit_count = sum(char.isdigit() for char in candidate)
-    if not _PHONE_MIN_DIGITS <= digit_count <= _PHONE_MAX_DIGITS:
+    if digit_count > _PHONE_MAX_DIGITS:
+        return NUMBER_MARKER
+    if digit_count < _PHONE_MIN_DIGITS:
         return candidate
     has_plus = match.group("plus") is not None
     has_separator = any(char in " .-()" for char in candidate)
@@ -59,7 +68,11 @@ def _replace_phone(match: re.Match[str]) -> str:
 
 
 def mask_pii(text: str) -> str:
-    """Mask e-mails, URLs, phone numbers and runs of 6+ digits, in that order."""
+    """Mask e-mails, URLs, phone numbers and runs of 6+ digits, in that order.
+
+    Digit groups joined by space, "." or "-" totalling more than 15 digits are
+    masked as ``[NUMBER]``.
+    """
     _check_str(text)
     masked = _EMAIL_RE.sub(EMAIL_MARKER, text)
     masked = _URL_RE.sub(URL_MARKER, masked)
