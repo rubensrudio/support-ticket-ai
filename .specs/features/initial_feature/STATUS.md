@@ -1,6 +1,6 @@
 # STATUS — initial_feature
 
-Atualizado em 2026-09-30T12:15:19 · integradora `feature/initial_feature-integration` · baseline `develop@8cacadf` (2026-09-30)
+Atualizado em 2026-09-30T12:18:23 · integradora `feature/initial_feature-integration` · baseline `develop@8cacadf` (2026-09-30)
 
 ## Baseline
 
@@ -16,7 +16,7 @@ Atualizado em 2026-09-30T12:15:19 · integradora `feature/initial_feature-integr
 | Onda | Tasks | Gate | Gatilhos | QA |
 |---|---|---|---|---|
 | 1 | TASK-001 | ✅ | — | NAO_INVOCADO |
-| 2 | TASK-004 | — | — | — |
+| 2 | TASK-004 | ✅ | G1 | EXAUSTIVO: APROVADO |
 | 3 | TASK-002, TASK-005 | — | — | — |
 | 4 | TASK-003, TASK-006, TASK-007, TASK-011 | — | — | — |
 | 5 | TASK-013 | — | — | — |
@@ -40,7 +40,7 @@ Atualizado em 2026-09-30T12:15:19 · integradora `feature/initial_feature-integr
 | TASK-001 | ✅ APROVADA | médio | 0/0/0 |  |
 | TASK-002 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-003 |  PENDENTE | médio | 0/0/0 |  |
-| TASK-004 |  PENDENTE | crítico | 0/0/0 |  |
+| TASK-004 | ✅ APROVADA | crítico | 0/0/0 |  |
 | TASK-005 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-006 |  PENDENTE | médio | 0/0/0 |  |
 | TASK-007 |  PENDENTE | médio | 0/0/0 |  |
@@ -68,8 +68,8 @@ Atualizado em 2026-09-30T12:15:19 · integradora `feature/initial_feature-integr
 
 ## Métricas
 
-- Aprovadas: 1/28 · bloqueadas: 0
-- Aprovadas em 1ª rodada: 1/1
-- Ondas fechadas: 1 · QA semântico invocado em 0
+- Aprovadas: 2/28 · bloqueadas: 0
+- Aprovadas em 1ª rodada: 2/2
+- Ondas fechadas: 2 · QA semântico invocado em 1
 - Regressões capturadas pelo gate mecânico: 0
 - Testes e2e de regressão criados a partir de achados do QA: 0

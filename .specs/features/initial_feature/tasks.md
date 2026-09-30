@@ -109,6 +109,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-004 — Load runtime settings from environment
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `API-04`, `FDBK-93`
 - **Tipo**: config
