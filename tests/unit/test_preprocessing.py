@@ -92,8 +92,26 @@ def test_data07_short_grouped_digits_are_not_phone() -> None:
     assert mask_pii("room 12-34 ok") == "room 12-34 ok"
 
 
-def test_data07_too_many_grouped_digits_are_not_phone() -> None:
-    assert mask_pii("x 1234-5678-9012-3456 y") == "x 1234-5678-9012-3456 y"
+def test_data07_lac34_grouped_digits_over_15_become_number() -> None:
+    assert mask_pii("x 1234-5678-9012-3456 y") == "x [NUMBER] y"
+    assert mask_pii("card 1234 5678 9012 3456") == "card [NUMBER]"
+    assert mask_pii("acct 1234.5678.9012.3456.78") == "acct [NUMBER]"
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("Tel +55 11 98765-4321 2024", "Tel [NUMBER]"),
+        ("Call 555-123-4567 123456", "Call [NUMBER]"),
+        ("Pay 1234-5678-9012-3456 now", "Pay [NUMBER] now"),
+    ],
+)
+def test_data07_lac33_lac34_no_phone_or_card_digits_leak(raw: str, expected: str) -> None:
+    masked = preprocess_text(raw)
+
+    assert masked == expected
+    assert not any(char.isdigit() for char in masked)
+    assert preprocess_text(masked) == masked
 
 
 def test_data07_number_threshold() -> None:
@@ -116,5 +134,5 @@ def test_data07_phone_parentheses_without_separator(raw: str) -> None:
 
 def test_data07_long_digit_run_followed_by_letter_is_fast() -> None:
     assert mask_pii("1" * 5000 + "a") == "[NUMBER]a"
-    assert mask_pii("12-" * 2000 + "a") == "12-" * 2000 + "a"
+    assert mask_pii("12-" * 2000 + "a") == "[NUMBER]-a"
     assert mask_pii("1" * 5000 + " x") == "[NUMBER] x"
