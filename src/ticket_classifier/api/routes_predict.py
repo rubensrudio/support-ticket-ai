@@ -13,9 +13,10 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from ticket_classifier.api.app import AppState, get_app_state, get_connection
-from ticket_classifier.api.errors import error_response
+from ticket_classifier.api.errors import VALIDATION_ERROR, error_response
 from ticket_classifier.api.schemas import ErrorBody, PredictRequest, PredictResponse
 from ticket_classifier.services.prediction_service import (
+    BlankFieldError,
     ModelUnavailableError,
     PredictionStorageError,
     predict_ticket,
@@ -44,6 +45,8 @@ def predict(
     started = time.perf_counter()
     try:
         result = predict_ticket(state, conn, request.title, request.description)
+    except BlankFieldError as exc:
+        return error_response(422, VALIDATION_ERROR, f"Field '{exc.field}' must not be blank.")
     except ModelUnavailableError as exc:
         logger.error("POST /predict returned 503 (%s).", type(exc).__name__)
         return error_response(503, MODEL_UNAVAILABLE, MODEL_UNAVAILABLE_MESSAGE)
