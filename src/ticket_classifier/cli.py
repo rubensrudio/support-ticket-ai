@@ -14,7 +14,7 @@ from typing import Any, Literal
 from ticket_classifier.data.prepare import prepare_dataset
 from ticket_classifier.errors import PipelineError
 from ticket_classifier.pipeline_config import load_pipeline_config
-from ticket_classifier.registry import ModelRegistry
+from ticket_classifier.registry import ModelRegistry, ModelVersion
 from ticket_classifier.settings import get_settings
 from ticket_classifier.storage.database import connect, init_schema, utc_now
 from ticket_classifier.storage.purge import PURGE_MESSAGE, purge_expired_predictions
@@ -33,6 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Support ticket classification pipeline and REST API.",
     )
     subparsers = parser.add_subparsers(dest="command", metavar="<command>")
+    _add_compare_command(subparsers)
     _add_list_versions_command(subparsers)
     _add_prepare_command(subparsers)
     _add_purge_command(subparsers)
@@ -160,6 +161,76 @@ def _run_list_versions(args: argparse.Namespace) -> int:
         print(
             "  ".join(cell.ljust(width) for cell, width in zip(row, widths, strict=True)).rstrip()
         )
+    return 0
+
+
+def _add_compare_command(subparsers: "argparse._SubParsersAction[Any]") -> None:
+    parser = subparsers.add_parser(
+        "compare", help="Compare a Baseline and a Transformer model version on the test split."
+    )
+    parser.add_argument(
+        "--baseline",
+        metavar="ID",
+        default=None,
+        help="Baseline version id (default: most recent baseline version).",
+    )
+    parser.add_argument(
+        "--transformer",
+        metavar="ID",
+        default=None,
+        help="Transformer version id (default: most recent transformer version).",
+    )
+    parser.add_argument(
+        "--artifacts-dir",
+        type=Path,
+        default=Path("artifacts"),
+        help="Directory containing registry.json; the report goes to <dir>/reports "
+        "(default: artifacts).",
+    )
+    parser.set_defaults(handler=_run_compare)
+
+
+def _resolve_version(registry: ModelRegistry, kind: str, version_id: str | None) -> ModelVersion:
+    if version_id is None:
+        version = registry.latest(kind)
+        if version is None:
+            raise PipelineError(f"No '{kind}' model version registered. Train it first.")
+        return version
+    version = registry.get(version_id)
+    if version.kind != kind:
+        raise PipelineError(f"Model version {version_id} is not a '{kind}' version.")
+    return version
+
+
+def _run_compare(args: argparse.Namespace) -> int:
+    from ticket_classifier.evaluation.report import build_comparison, write_report
+
+    registry = ModelRegistry(args.artifacts_dir)
+    baseline = _resolve_version(registry, "baseline", args.baseline)
+    transformer = _resolve_version(registry, "transformer", args.transformer)
+    report = build_comparison(baseline, transformer)
+    md_path, json_path = write_report(report, args.artifacts_dir / "reports")
+    rows: list[tuple[str, ...]] = [
+        ("target", "baseline_macro_f1", "transformer_macro_f1", "delta_pp")
+    ]
+    for target, delta in report.macro_f1_delta_pp.items():
+        rows.append(
+            (
+                target,
+                _format_f1(baseline.test_macro_f1(target)),
+                _format_f1(transformer.test_macro_f1(target)),
+                f"{delta:+.2f}",
+            )
+        )
+    widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
+    print(f"Baseline: {report.baseline_id}")
+    print(f"Transformer: {report.transformer_id}")
+    for row in rows:
+        print(
+            "  ".join(cell.ljust(width) for cell, width in zip(row, widths, strict=True)).rstrip()
+        )
+    print(f"Verdict: {report.verdict}")
+    print(f"Report: {md_path} and {json_path}")
     return 0
 
 
