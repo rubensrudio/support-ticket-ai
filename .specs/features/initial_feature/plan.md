@@ -86,8 +86,8 @@ Formato JUnit conforme `setup-junit.md` (seção pytest).
 | Instalar dependências | `uv sync --all-extras` | `.` | — | `pyproject.toml` + `uv.lock` (TASK-001) |
 | Lint | `uv run ruff check . --output-format=concise` | `.` | — | `pyproject.toml` `[tool.ruff]` (TASK-001) |
 | Typecheck | `uv run mypy src` | `.` | — | `pyproject.toml` `[tool.mypy]` (TASK-001) |
-| Teste (suíte) | `uv run pytest` | `.` | `reports/junit.xml` | `pyproject.toml` `[tool.pytest.ini_options]` addopts com `--junitxml=reports/junit.xml -m "not container"` (TASK-001) |
-| Teste (relacionado a arquivo) | `uv run pytest {files}` | `.` | `reports/junit.xml` | idem |
+| Teste (suíte) | `uv run pytest --junitxml=reports/junit.xml` | `.` | `reports/junit.xml` | `pyproject.toml` `[tool.pytest.ini_options]` addopts com `--junitxml=reports/junit.xml -m "not container"` (TASK-001) |
+| Teste (relacionado a arquivo) | `uv run pytest --junitxml=reports/junit.xml {files}` | `.` | `reports/junit.xml` | idem |
 | Build | `uv build --wheel --out-dir dist` | `.` | — | `pyproject.toml` `[build-system]` hatchling (TASK-001) |
 | Subir ambiente local | `uv run uvicorn ticket_classifier.api.app:create_app --factory --host 127.0.0.1 --port 8000` | `.` | — | README (TASK-023) |
 | Subir ambiente local (container) | `docker build -f docker/Dockerfile -t support-ticket-ai . && docker run --rm -p 8000:8000 -v "$(pwd)/artifacts:/app/artifacts:ro" -v "$(pwd)/var:/app/var" -e TICKET_API_KEY support-ticket-ai` | `.` | — | `docker/Dockerfile` + README (TASK-028) |
@@ -95,7 +95,7 @@ Formato JUnit conforme `setup-junit.md` (seção pytest).
 | Credenciais QA | `TICKET_API_KEY` | — | — | variável de ambiente lida por `Settings` (CT-4); só o nome |
 | Preparar dataset (manual) | `uv run ticket-classifier prepare` | `.` | — | CLI (TASK-009); exige `data/raw/tickets.csv` baixado |
 | Treino real do Transformer (manual, fora dos gates) | `uv run ticket-classifier train-transformer` | `.` | — | CLI (TASK-016); baixa `distilbert-base-uncased` do HF Hub |
-| Smoke do container (Gate da TASK-028) | `uv run pytest -m container tests/container/test_container_smoke.py` | `.` | `reports/junit.xml` | marcador `container` (TASK-001, TASK-028) |
+| Smoke do container (Gate da TASK-028) | `uv run pytest --junitxml=reports/junit.xml -m container tests/container/test_container_smoke.py` | `.` | `reports/junit.xml` | marcador `container` (TASK-001, TASK-028) |
 
 Notas:
 - Não há Playwright: projeto sem tela. Linhas e2e omitidas.

@@ -1003,14 +1003,14 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 - **Contrato**:
   - CT-23, CT-24, CT-25 (consome)
 - **Testes**: e2e
-- **Gate**: `uv run pytest -m container tests/container/test_container_smoke.py` (executar em `.`)
+- **Gate**: `uv run pytest --junitxml=reports/junit.xml -m container tests/container/test_container_smoke.py` (executar em `.`)
 - **Descrição**: Imagem `python:3.12-slim`, `uv` copiado de `ghcr.io/astral-sh/uv:0.12.21`, `uv sync --frozen --no-dev` sem o extra `train` (camada de dependências antes do código), `ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TICKET_ARTIFACTS_DIR=/app/artifacts TICKET_DB_PATH=/app/var/tickets.db`, usuário não-root, `EXPOSE 8000`, `CMD` uvicorn `--factory ticket_classifier.api.app:create_app --host 0.0.0.0 --port 8000`. O ignore exclui `.venv`, `data`, `artifacts`, `var`, `reports`, `mlflow.db`, `.git`, `.specs`. O smoke constrói a imagem, gera baseline promovido em `tmp_path`, sobe o container na porta 18080 com o volume de artefatos e `TICKET_API_KEY`, e remove o container no fim.
 - **Done when**:
   - [ ] `docker build -f docker/Dockerfile -t support-ticket-ai .` termina com exit 0
   - [ ] `docker run --rm support-ticket-ai python -c "import torch, importlib.util; assert torch.version.cuda is None; assert importlib.util.find_spec('mlflow') is None"` termina com exit 0
   - [ ] No smoke, `GET http://localhost:18080/health` → 200 com `model_version` e `POST /predict` com ticket válido → 200 com `prediction_id`
   - [ ] `README.md` contém as seções `Run with Docker` e `Architecture`
-  - [ ] `uv run pytest -m container tests/container/test_container_smoke.py` passa
+  - [ ] `uv run pytest --junitxml=reports/junit.xml -m container tests/container/test_container_smoke.py` passa
   - [ ] `uv run pytest` (suíte padrão) não executa o smoke do container
 - **Não fazer**:
   - Não copiar `artifacts/` nem modelos para dentro da imagem
