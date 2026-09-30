@@ -967,6 +967,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-027 — Retrain with feedback and gated promotion
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `RETR-01`, `RETR-02`, `RETR-03`, `RETR-04`, `RETR-90`, `RETR-91`, `RETR-92`
 - **Tipo**: lógica-negócio
