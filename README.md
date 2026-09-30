@@ -68,6 +68,40 @@ discarded rows by reason, label counts per split). If the source file is missing
 source label is unmapped, or a category has fewer than 100 training examples, the command
 exits with code 1 and writes nothing.
 
+## Training
+
+Training needs the `train` extra (MLflow), installed by `uv sync --all-extras`. Train,
+evaluate and register a model version from the prepared splits:
+
+```bash
+uv run ticket-classifier train-baseline
+uv run ticket-classifier train-transformer
+```
+
+Both commands accept `--config` (default `configs/pipeline.toml`) and print
+`Registered model version '<id>' (<kind>). Promoted: yes|no.` Each run:
+
+- fails before training (exit code 1) if `train`, `validation` or `test` is empty or missing;
+- trains on `train` only, selects hyperparameters on `validation` and never uses `test`
+  for training;
+- evaluates on `validation` and `test` and registers a new version with the metrics, the
+  `splits_version`, the seed and the hyperparameters;
+- promotes the version only if it is the first `transformer` version and no version is
+  promoted yet.
+
+Artifacts:
+
+- Model files: `artifacts/models/<version_id>/` (the root is `TICKET_ARTIFACTS_DIR`,
+  default `artifacts`).
+- Registry: `artifacts/registry.json`. List the versions with
+  `uv run ticket-classifier list-versions`.
+- Experiment tracking: MLflow at `MLFLOW_TRACKING_URI` (default `sqlite:///mlflow.db`),
+  with parameters, metrics, confusion matrices and the trained model.
+
+> **Note:** the real Transformer training downloads `distilbert-base-uncased` from the
+> Hugging Face Hub on first use. The test suite uses a local tiny model and never
+> downloads anything.
+
 ## Development
 
 | Task      | Command                                              |
