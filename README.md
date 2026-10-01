@@ -1,5 +1,7 @@
 # ticket-classifier
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 ## Overview
 
 `ticket-classifier` is a support ticket classification project: a training pipeline
@@ -49,3 +51,9 @@ the following environment variables before any test module is imported:
 
 Tests must use local fixtures only; any test that would need network access fails
 instead of silently downloading data.
+
+## License
+
+Licensed under the **MIT License** — see [`LICENSE`](LICENSE).
+
+Copyright © 2026 Rubens Rudio.
