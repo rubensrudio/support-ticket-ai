@@ -788,6 +788,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-023 — Create API factory with model loading and health endpoint
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-01`, `API-09`, `API-94`, `FDBK-93`
 - **Tipo**: crud-padrão

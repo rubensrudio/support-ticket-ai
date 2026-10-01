@@ -199,3 +199,11 @@ Etapa: `/generate-plan`, Passo 3.
 - **Recomendação do hm-reviewer**: A (Jev card_required=0.56, dúvida)
 - **Escolha**: A
 - **Observações**: requer atualização de spec/plan (DA-6, DATA-07).
+
+### LAC-35 — Banco SQLite inacessível no startup da API
+- **Data**: 2026-09-30
+- **Etapa/Task**: QA da onda 10 · TASK-023 (`src/ticket_classifier/api/app.py`, `_init_database` no lifespan)
+- **Opções apresentadas**: A) manter: banco inacessível impede o startup; API-94 cobre só "Versão promovida carregável" B) tolerar: API sobe e `/health` responde 503
+- **Recomendação do hm-qa**: A (Jev api94_db=0.52, dúvida; reviewer: spec não pede tolerância)
+- **Escolha**: A
+- **Observações**: sem mudança de spec/plan.
