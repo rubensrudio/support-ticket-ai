@@ -276,6 +276,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-009 — Implement dataset preparation command
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `DATA-01`, `DATA-03`, `DATA-04`, `DATA-05`, `DATA-06`, `DATA-09`, `DATA-10`, `DATA-11`, `DATA-12`, `DATA-90`, `DATA-92`
 - **Tipo**: lógica-negócio
@@ -463,6 +464,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-014 — Implement deterministic Transformer fine-tuning loop
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-02`, `MODEL-06`, `MODEL-07`
 - **Tipo**: lógica-negócio
@@ -643,6 +645,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-019 — Create SQLite schema and prediction repository
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `API-07`, `API-95`
 - **Tipo**: crud-padrão
@@ -745,6 +748,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-022 — Define API schemas and validation error format
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `API-90`, `API-91`, `API-92`, `API-93`, `FDBK-92`
 - **Tipo**: crud-padrão
