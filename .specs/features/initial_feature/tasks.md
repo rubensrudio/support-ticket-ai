@@ -276,6 +276,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-009 — Implement dataset preparation command
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `DATA-01`, `DATA-03`, `DATA-04`, `DATA-05`, `DATA-06`, `DATA-09`, `DATA-10`, `DATA-11`, `DATA-12`, `DATA-90`, `DATA-92`
 - **Tipo**: lógica-negócio
@@ -463,6 +464,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-014 — Implement deterministic Transformer fine-tuning loop
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-02`, `MODEL-06`, `MODEL-07`
 - **Tipo**: lógica-negócio
@@ -526,6 +528,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-016 — Orchestrate training, evaluation and registration
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-06`, `MODEL-07`, `MODEL-08`, `MODEL-09`, `MODEL-90`, `OPS-04`
 - **Tipo**: lógica-negócio
@@ -572,6 +575,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-017 — Generate baseline versus Transformer comparison report
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-04`, `MODEL-05`
 - **Tipo**: lógica-negócio
@@ -606,6 +610,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-018 — Analyze errors of the promoted model
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-10`, `MODEL-11`
 - **Tipo**: lógica-negócio
@@ -643,6 +648,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-019 — Create SQLite schema and prediction repository
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `API-07`, `API-95`
 - **Tipo**: crud-padrão
@@ -678,6 +684,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-020 — Implement append-only feedback repository
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `FDBK-01`, `FDBK-02`, `FDBK-03`, `FDBK-04`, `FDBK-94`
 - **Tipo**: crud-padrão
@@ -710,6 +717,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-021 — Purge expired predictions without feedback
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-07`, `OPS-90`
 - **Tipo**: crud-padrão
@@ -745,6 +753,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-022 — Define API schemas and validation error format
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `API-90`, `API-91`, `API-92`, `API-93`, `FDBK-92`
 - **Tipo**: crud-padrão
@@ -781,6 +790,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-023 — Create API factory with model loading and health endpoint
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-01`, `API-09`, `API-94`, `FDBK-93`
 - **Tipo**: crud-padrão
@@ -824,6 +834,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-024 — Implement POST /predict with review flag and persistence
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `API-01`, `API-02`, `API-03`, `API-04`, `API-05`, `API-06`, `API-07`, `API-08`, `API-90`, `API-91`, `API-92`, `API-93`, `API-94`, `API-95`, `API-96`
 - **Tipo**: lógica-negócio
@@ -873,6 +884,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-025 — Implement POST /feedback with API key
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `FDBK-01`, `FDBK-02`, `FDBK-04`, `FDBK-90`, `FDBK-91`, `FDBK-92`, `FDBK-93`, `FDBK-95`
 - **Tipo**: crud-padrão
@@ -919,6 +931,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-026 — Schedule automatic purge in the API lifespan
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-08`
 - **Tipo**: infra
@@ -954,6 +967,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-027 — Retrain with feedback and gated promotion
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `RETR-01`, `RETR-02`, `RETR-03`, `RETR-04`, `RETR-90`, `RETR-91`, `RETR-92`
 - **Tipo**: lógica-negócio
@@ -998,6 +1012,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-028 — Package the API as a CPU-only Docker image
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-02`
 - **Tipo**: infra

@@ -199,3 +199,27 @@ Etapa: `/generate-plan`, Passo 3.
 - **Recomendação do hm-reviewer**: A (Jev card_required=0.56, dúvida)
 - **Escolha**: A
 - **Observações**: requer atualização de spec/plan (DA-6, DATA-07).
+
+### LAC-35 — Banco SQLite inacessível no startup da API
+- **Data**: 2026-09-30
+- **Etapa/Task**: QA da onda 10 · TASK-023 (`src/ticket_classifier/api/app.py`, `_init_database` no lifespan)
+- **Opções apresentadas**: A) manter: banco inacessível impede o startup; API-94 cobre só "Versão promovida carregável" B) tolerar: API sobe e `/health` responde 503
+- **Recomendação do hm-qa**: A (Jev api94_db=0.52, dúvida; reviewer: spec não pede tolerância)
+- **Escolha**: A
+- **Observações**: sem mudança de spec/plan.
+
+### LAC-36 — Campo só com caracteres de controle no `/predict`
+- **Data**: 2026-09-30
+- **Etapa/Task**: QA da onda 11 · TASK-024 (`src/ticket_classifier/services/prediction_service.py`) × TASK-022 (`src/ticket_classifier/api/schemas.py`)
+- **Opções apresentadas**: A) API-92 vale para campo vazio após o pré-processamento DATA-08 → 422 blank, nada gravado B) "vazio" = só após strip; aceitar 200 com título gravado vazio
+- **Recomendação do hm-qa**: nenhuma (Jev api92_letter=0.51, dúvida); orquestrador recomendou A
+- **Escolha**: A
+- **Observações**: requer atualização de spec/plan (API-92, 8.3).
+
+### LAC-37 — Container serve 503 após promover e reiniciar
+- **Data**: 2026-09-30
+- **Etapa/Task**: QA da onda 17 · TASK-028 (`README.md` "Run with Docker"; causa raiz em `src/ticket_classifier/registry.py` `_write`)
+- **Opções apresentadas**: A) reprovar e documentar no README: repetir `chmod -R a+rX artifacts` após cada train/promote/retrain, antes de reiniciar o container B) aprovar como está, com follow-up no `registry.py`
+- **Recomendação do hm-qa**: nenhuma (Jev api09_violation=0.45, dúvida); orquestrador recomendou A
+- **Escolha**: A
+- **Observações**: follow-up obrigatório fora do escopo: `registry.py` `_write` gravar `registry.json` com 0o644 (hoje mkstemp 0600) e remover o passo manual do README.
