@@ -1,6 +1,6 @@
 # STATUS — initial_feature
 
-Atualizado em 2026-09-30T17:56:33 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
+Atualizado em 2026-09-30T20:09:01 · integradora `feature/initial_feature-integration` · baseline `develop@954e20d` (2026-09-30)
 
 ## Baseline
 
@@ -49,6 +49,7 @@ Atualizado em 2026-09-30T17:56:33 · integradora `feature/initial_feature-integr
 | 10 | 12 | TASK-025 | `feature/initial_feature-phase-10` → `feature/initial_feature-phase-9` | https://github.com/rubensrudio/support-ticket-ai/pull/10 |
 | 11 | 13 | TASK-026 | `feature/initial_feature-phase-11` → `feature/initial_feature-phase-10` | https://github.com/rubensrudio/support-ticket-ai/pull/11 |
 | 12 | 14 | TASK-017 | `feature/initial_feature-phase-12` → `feature/initial_feature-phase-11` | https://github.com/rubensrudio/support-ticket-ai/pull/12 |
+| 13 | 15, 16, 17 | TASK-018, TASK-027, TASK-028 | `feature/initial_feature-phase-13` → `feature/initial_feature-phase-12` | https://github.com/rubensrudio/support-ticket-ai/pull/13 |
 
 ## Tasks
 
@@ -90,3 +91,4 @@ Atualizado em 2026-09-30T17:56:33 · integradora `feature/initial_feature-integr
 - Ondas fechadas: 17 · QA semântico invocado em 13
 - Regressões capturadas pelo gate mecânico: 0
 - Testes e2e de regressão criados a partir de achados do QA: 0
+- Gate final: ✅ em 2026-09-30T19:53 (HEAD e0893bc)
