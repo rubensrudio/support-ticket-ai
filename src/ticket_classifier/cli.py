@@ -33,10 +33,12 @@ def build_parser() -> argparse.ArgumentParser:
         description="Support ticket classification pipeline and REST API.",
     )
     subparsers = parser.add_subparsers(dest="command", metavar="<command>")
+    _add_analyze_errors_command(subparsers)
     _add_compare_command(subparsers)
     _add_list_versions_command(subparsers)
     _add_prepare_command(subparsers)
     _add_purge_command(subparsers)
+    _add_retrain_command(subparsers)
     _add_train_baseline_command(subparsers)
     _add_train_transformer_command(subparsers)
     return parser
@@ -231,6 +233,90 @@ def _run_compare(args: argparse.Namespace) -> int:
         )
     print(f"Verdict: {report.verdict}")
     print(f"Report: {md_path} and {json_path}")
+    return 0
+
+
+_NO_PROMOTED_MESSAGE = "No promoted model version. Train a transformer first."
+
+
+def _add_analyze_errors_command(subparsers: "argparse._SubParsersAction[Any]") -> None:
+    parser = subparsers.add_parser(
+        "analyze-errors", help="Analyze the errors of a model version on the test split."
+    )
+    parser.add_argument(
+        "--version",
+        metavar="ID",
+        default=None,
+        help="Model version id (default: the promoted version).",
+    )
+    _add_train_config_argument(parser)
+    parser.set_defaults(handler=_run_analyze_errors)
+
+
+def _run_analyze_errors(args: argparse.Namespace) -> int:
+    # Imported lazily: loading a classifier pulls in torch and transformers.
+    from ticket_classifier.data.splits import load_split
+    from ticket_classifier.evaluation.error_analysis import analyze_errors, write_error_analysis
+    from ticket_classifier.models.loader import load_classifier
+
+    settings = get_settings()
+    registry = ModelRegistry(settings.artifacts_dir)
+    if args.version is None:
+        version = registry.get_promoted()
+        if version is None:
+            raise PipelineError(_NO_PROMOTED_MESSAGE)
+    else:
+        version = registry.get(args.version)
+    config = load_pipeline_config(args.config)
+    test = load_split(config.data.processed_dir, "test")
+    classifier = load_classifier(version, settings.artifacts_dir)
+    analysis = analyze_errors(classifier, version.version_id, test, settings.review_threshold)
+    md_path, json_path = write_error_analysis(analysis, settings.artifacts_dir / "reports")
+    print(f"Model version: {version.version_id}")
+    print(f"Errors: {len(analysis.errors)} of {len(test)} test tickets")
+    print(f"Review threshold: {analysis.threshold}")
+    print(f"needs_review fraction: {analysis.needs_review_fraction:.4f}")
+    print(f"Report: {md_path} and {json_path}")
+    return 0
+
+
+def _add_retrain_command(subparsers: "argparse._SubParsersAction[Any]") -> None:
+    parser = subparsers.add_parser(
+        "retrain",
+        help="Retrain a Transformer version with the current feedback and promote it "
+        "if it is not worse than the promoted version on the test split.",
+    )
+    _add_train_config_argument(parser)
+    parser.set_defaults(handler=_run_retrain)
+
+
+def _run_retrain(args: argparse.Namespace) -> int:
+    # Imported lazily: retraining pulls in torch, transformers and mlflow.
+    from ticket_classifier.retraining import run_retraining
+
+    config = load_pipeline_config(args.config)
+    result = run_retraining(config, get_settings())
+    rows: list[tuple[str, ...]] = [
+        ("role", "version_id", "test_category_macro_f1", "test_priority_macro_f1")
+    ]
+    for role, version in (("new", result.new_version), ("promoted", result.previous_version)):
+        rows.append(
+            (
+                role,
+                version.version_id,
+                _format_f1(version.test_macro_f1("category")),
+                _format_f1(version.test_macro_f1("priority")),
+            )
+        )
+    widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
+    for row in rows:
+        print(
+            "  ".join(cell.ljust(width) for cell, width in zip(row, widths, strict=True)).rstrip()
+        )
+    print(
+        f"Retraining finished: {result.feedback_rows} feedback records used. "
+        f"Decision: {result.decision}."
+    )
     return 0
 
 

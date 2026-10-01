@@ -610,6 +610,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-018 — Analyze errors of the promoted model
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `MODEL-10`, `MODEL-11`
 - **Tipo**: lógica-negócio
@@ -966,6 +967,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-027 — Retrain with feedback and gated promotion
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `RETR-01`, `RETR-02`, `RETR-03`, `RETR-04`, `RETR-90`, `RETR-91`, `RETR-92`
 - **Tipo**: lógica-negócio
@@ -1010,6 +1012,7 @@ decisões `DA-n` estão em `plan.md` (seções 8.2 e 5.3). Comandos de gate:
 ---
 
 ### TASK-028 — Package the API as a CPU-only Docker image
+- **Status**: ✅ APROVADA em 2026-09-30
 
 - **Requisito**: `OPS-02`
 - **Tipo**: infra

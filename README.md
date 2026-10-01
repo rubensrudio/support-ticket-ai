@@ -102,6 +102,45 @@ Artifacts:
 > Hugging Face Hub on first use. The test suite uses a local tiny model and never
 > downloads anything.
 
+## Retraining
+
+Retraining is manual. It trains a new Transformer version on the original `train` split
+plus the current feedback (the latest feedback of each stored prediction, with its masked
+title and description), selects on the original `validation` split and evaluates on the
+frozen `test` split, which never contains feedback.
+
+Prerequisites:
+
+- a promoted model version (`uv run ticket-classifier train-transformer`);
+- the prepared splits used by the promoted version (same `splits_version`);
+- at least one feedback record in the prediction database (`TICKET_DB_PATH`, default
+  `var/tickets.db`).
+
+```bash
+uv run ticket-classifier retrain
+```
+
+The command accepts `--config` (default `configs/pipeline.toml`), prints the test Macro F1
+of `category` and `priority` for the new and the promoted version, and ends with
+`Retraining finished: <n> feedback records used. Decision: promoted.` or
+`... Decision: not promoted.`
+
+Promotion rule: the new version is promoted only if its test Macro F1 of `category` **and**
+its test Macro F1 of `priority` are both greater than or equal to the promoted version's;
+the previous version becomes `retired`. Otherwise the new version stays `registered` and
+the promoted version is kept.
+
+The command exits with code 1 and registers nothing if:
+
+- another retraining run is in progress (`A retraining run is already in progress.`); runs
+  are serialized with a lock on `artifacts/retrain.lock`;
+- no version is promoted (`No promoted model version. Train a transformer first.`);
+- the splits changed since the promoted version was trained
+  (`Frozen test set changed: ... Retraining aborted.`);
+- there is no feedback (`No feedback records available. Retraining aborted.`).
+
+If training fails, the promoted version is kept and no version is promoted.
+
 ## Results
 
 Compare the most recent Baseline and Transformer versions (or specific ones with
@@ -149,6 +188,96 @@ curl http://127.0.0.1:8000/health
 
 - `200 {"status": "ok", "model_version": "<version_id>"}` when a model is loaded;
 - `503 {"status": "unavailable", "model_version": null}` otherwise.
+
+## Run with Docker
+
+The image (`docker/Dockerfile`) runs the API on CPU only: `python:3.12-slim`, runtime
+dependencies from `uv.lock` without the `dev` group and without the `train` extra (no
+MLflow), a non-root user, and Hugging Face offline mode (`HF_HUB_OFFLINE=1`,
+`TRANSFORMERS_OFFLINE=1`). Model artifacts are **not** copied into the image: train and
+promote a version first, then mount `artifacts/`.
+
+Build and run from the repository root:
+
+```bash
+docker build -f docker/Dockerfile -t support-ticket-ai . && docker run --rm -p 8000:8000 -v "$(pwd)/artifacts:/app/artifacts:ro" -v "$(pwd)/var:/app/var" -e TICKET_API_KEY support-ticket-ai
+```
+
+- `artifacts/` is mounted read-only at `/app/artifacts` (`TICKET_ARTIFACTS_DIR`). The
+  registry file is written with owner-only permissions, so make the tree readable by the
+  container user (UID `10001`) before running: `chmod -R a+rX artifacts`. Otherwise the
+  API starts without a model and `/health` returns `503`.
+- Repeat `chmod -R a+rX artifacts` after every train, promote or retrain on the host
+  (`train-baseline`, `train-transformer`, `retrain` or any promotion) and before
+  (re)starting the container: each registry write resets `artifacts/registry.json` to
+  owner-only permissions. If you forget, the restarted API serves no model: `/health` returns
+  `503 {"status": "unavailable", "model_version": null}` and the container log shows
+  `Promoted model could not be loaded (PipelineError: Cannot read the model registry.)`.
+  Run the `chmod` again and restart the container (`docker restart <container>`).
+- `var/` holds the SQLite database at `/app/var/tickets.db` (`TICKET_DB_PATH`). The
+  container runs as the non-root user with UID `10001`, so the host directory must exist
+  and be writable by that UID before the first run (for example
+  `mkdir -p var && sudo chown 10001:10001 var`).
+- `-e TICKET_API_KEY` passes the key from your shell; without it `/feedback` rejects
+  every request.
+
+Check it with `curl http://localhost:8000/health`. The container smoke test builds the
+image and runs it on port `18080`; it is excluded from the default test run:
+
+```bash
+uv run pytest --junitxml=reports/junit.xml -m container tests/container/test_container_smoke.py
+```
+
+## Architecture
+
+Components (package `ticket_classifier`):
+
+| Component  | Modules                                       | Role |
+|------------|-----------------------------------------------|------|
+| CLI        | `cli.py`                                      | `prepare`, `train-baseline`, `train-transformer`, `list-versions`, `compare`, `analyze-errors`, `retrain`, `purge` |
+| Data       | `data/`, `preprocessing.py`                   | Load the CSV, filter English, mask PII, map labels, dedup, stratified split |
+| Models     | `models/`                                     | Baseline (TF-IDF + logistic regression), Transformer (DistilBERT, two heads), loader |
+| Training   | `training.py`, `retraining.py`, `tracking.py` | Train, evaluate and register versions; MLflow tracking; gated retraining |
+| Evaluation | `evaluation/`                                 | Metrics, comparison report, error analysis |
+| Registry   | `registry.py`                                 | `artifacts/registry.json` with all versions and the single promoted one |
+| API        | `api/`                                        | FastAPI app factory, `/health`, `/predict`, `/feedback`, error handlers, purge loop |
+| Services   | `services/prediction_service.py`              | Prediction use case |
+| Storage    | `storage/`                                    | SQLite schema, predictions, feedback, retention purge |
+
+`POST /predict` flow:
+
+1. At startup the app creates the SQLite schema and loads the promoted version once.
+2. The body (`title`, `description`) is validated by the schema; invalid input returns `422`.
+3. Both fields are normalized and PII-masked with the same routine used in training; a
+   field left empty by this step also returns `422`.
+4. If no model is loaded, the API returns `503 MODEL_UNAVAILABLE`.
+5. The classifier returns category and priority probabilities; `needs_review` is set when
+   a confidence is below `TICKET_REVIEW_THRESHOLD`.
+6. The masked ticket and the prediction are stored under a new `prediction_id`; a storage
+   failure returns `503 STORAGE_UNAVAILABLE`.
+7. The response carries the prediction, the top categories and the `model_version`.
+
+Architectural decisions:
+
+| ID    | Decision |
+|-------|----------|
+| DA-1  | Python 3.12 with `uv` and `uv.lock`, `src/` layout, hatchling build |
+| DA-2  | CPU-only `torch` from the PyTorch CPU index |
+| DA-3  | Pinned public dataset file and revision, downloaded manually (no download code) |
+| DA-4  | Versioned TOML label mapping: priority table, queue defaults, ordered tag rules |
+| DA-5  | Fixed prepare order; all validation happens before anything is written |
+| DA-6  | PII masking order EMAIL, URL, PHONE, NUMBER after Unicode normalization |
+| DA-7  | DistilBERT with a shared encoder and two linear heads, `max_length = 256` |
+| DA-8  | Single seed and fixed thread count for deterministic training |
+| DA-9  | Offline tests with a tiny local model and a synthetic sample dataset |
+| DA-10 | Own model registry in `registry.json`; MLflow is tracking only, the API does not use it |
+| DA-11 | SQLite with WAL, foreign keys, one connection per request, `BEGIN IMMEDIATE` |
+| DA-12 | Synchronous routes; inference serialized by a lock inside the classifier |
+| DA-13 | `/feedback` checks the API key before parsing the JSON body |
+| DA-14 | Retention purge as an `asyncio` task started in the app lifespan |
+| DA-15 | Retraining serialized with an OS file lock on `artifacts/retrain.lock` |
+| DA-16 | Class weighting for imbalance; checkpoint selection by mean validation Macro F1 |
+| DA-17 | `argparse` CLI; domain errors print to stderr and exit with code 1 |
 
 ## Configuration
 
